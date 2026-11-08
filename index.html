@@ -1,0 +1,552 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kompas Wirausaha Saya</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: one narrow column, one task per screen, sticky header and bottom bar, thumb-sized controls.
+   Colour: navy ink and header, amber/teal/coral zone colours taken from the EntreComp areas, cool neutrals. */
+:root{
+  --bg:#F3F5F9; --surface:#FFFFFF; --ink:#16233B; --muted:#58657A; --line:#D8DEE9;
+  --brand:#1F3A5F; --brand-ink:#FFFFFF; --accent:#D9481F; --accent-soft:#FDE9E2;
+  --z1:#E0A800; --z2:#0E8F9B; --z3:#D9481F;
+  --good:#17803D; --good-soft:#E1F4E7; --warn:#A35A00; --warn-soft:#FDF0D8;
+  --sel:#1F3A5F; --sel-ink:#FFFFFF; --head-bg:#1F3A5F; --head-ink:#FFFFFF; --focus:#2563EB;
+  --font:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0E1626; --surface:#17223A; --ink:#E8EEF9; --muted:#9DABC2; --line:#2B3A58;
+    --brand:#9CC0F2; --brand-ink:#0E1626; --accent:#FF8A63; --accent-soft:#3A2420;
+    --z1:#F2C230; --z2:#35C0CC; --z3:#FF8A63;
+    --good:#5FD38A; --good-soft:#143324; --warn:#F2B04C; --warn-soft:#3A2D14;
+    --sel:#9CC0F2; --sel-ink:#0E1626; --head-bg:#111D33; --head-ink:#E8EEF9; --focus:#7AA7FF; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0E1626; --surface:#17223A; --ink:#E8EEF9; --muted:#9DABC2; --line:#2B3A58;
+  --brand:#9CC0F2; --brand-ink:#0E1626; --accent:#FF8A63; --accent-soft:#3A2420;
+  --z1:#F2C230; --z2:#35C0CC; --z3:#FF8A63;
+  --good:#5FD38A; --good-soft:#143324; --warn:#F2B04C; --warn-soft:#3A2D14;
+  --sel:#9CC0F2; --sel-ink:#0E1626; --head-bg:#111D33; --head-ink:#E8EEF9; --focus:#7AA7FF; color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.45;-webkit-text-size-adjust:100%}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--head-bg);z-index:30}
+button,input,textarea,select{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.wrap{max-width:520px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--head-bg);color:var(--head-ink)}
+.top .wrap{padding-block:10px;display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px}
+.brand{font-weight:800;font-size:1.05rem;letter-spacing:.01em;flex:1 1 auto;min-width:0}
+.langs{display:flex;gap:4px}
+.langs button{min-height:36px;min-width:44px;padding:0 10px;border-radius:999px;border:1.5px solid color-mix(in srgb,var(--head-ink) 45%,transparent);background:transparent;color:var(--head-ink);font-weight:700;font-size:.82rem;cursor:pointer}
+.langs button[aria-pressed="true"]{background:var(--head-ink);color:var(--head-bg);border-color:var(--head-ink)}
+.prog{flex:1 0 100%;display:flex;align-items:center;gap:10px;font-size:.82rem}
+.prog .bar{flex:1;height:8px;border-radius:99px;background:color-mix(in srgb,var(--head-ink) 22%,transparent);overflow:hidden}
+.prog .bar i{display:block;height:100%;background:var(--z1);border-radius:99px;transition:width .25s}
+main{padding-block:16px 28px;display:flex;flex-direction:column;gap:16px}
+h1,h2,h3{line-height:1.2;margin:0;text-wrap:balance}
+h1{font-size:1.65rem}
+h2{font-size:1.3rem}
+h3{font-size:1.05rem}
+p{margin:0}
+.eh{display:flex;gap:10px;align-items:flex-start}
+.eh>span{flex:0 0 auto}
+.eh>div{min-width:0}
+.en{display:block;font-size:.86em;color:var(--muted);font-style:italic;font-weight:400}
+.id{display:block}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:12px}
+.hero{background:var(--head-bg);color:var(--head-ink);border-radius:14px;padding:20px 18px;display:flex;flex-direction:column;gap:8px}
+.hero .en{color:color-mix(in srgb,var(--head-ink) 72%,transparent)}
+.muted{color:var(--muted);font-size:.9rem}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label,.field .lab{font-weight:700}
+.hint{font-size:.82rem;color:var(--muted)}
+input[type=text],textarea{width:100%;border:1.5px solid var(--line);border-radius:10px;padding:12px;background:var(--bg);min-height:48px}
+textarea{min-height:84px;resize:vertical}
+input[type=text]{font-size:1.15rem;font-weight:700}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{min-height:48px;padding:8px 16px;border-radius:12px;border:1.5px solid var(--line);background:var(--surface);font-weight:600;cursor:pointer;text-align:left;flex:1 1 auto}
+.chip[aria-pressed="true"]{background:var(--sel);color:var(--sel-ink);border-color:var(--sel)}
+.chip[aria-pressed="true"] .en{color:inherit;opacity:.85}
+.btn{min-height:52px;padding:10px 18px;border-radius:12px;border:0;background:var(--sel);color:var(--sel-ink);font-weight:800;cursor:pointer;text-align:center}
+.btn.alt{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
+.btn.small{min-height:44px;padding:8px 14px;font-size:.92rem}
+.btn[aria-disabled="true"]{opacity:.45;cursor:not-allowed}
+.btn .en{color:inherit;opacity:.85}
+.link{background:none;border:0;padding:8px 0;min-height:44px;color:var(--ink);text-decoration:underline;text-underline-offset:3px;cursor:pointer;text-align:left}
+.err{color:var(--accent);font-weight:700;font-size:.9rem}
+.ok{color:var(--good);font-weight:700;font-size:.9rem}
+.zone{display:flex;align-items:center;gap:8px;font-size:.82rem;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+.zone i{width:12px;height:12px;border-radius:50%;background:var(--zc)}
+.item{display:flex;flex-direction:column;gap:10px;padding-top:14px;border-top:1px solid var(--line)}
+.item:first-of-type{border-top:0;padding-top:0}
+.stmt{font-weight:600;font-size:1.02rem}
+.scale{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.scale button{min-height:62px;border-radius:12px;border:1.5px solid var(--line);background:var(--surface);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:4px 0}
+.scale .em{font-size:1.4rem;line-height:1}
+.scale .n{font-size:.78rem;font-weight:800;color:var(--muted)}
+.scale button[aria-checked="true"] .n{color:inherit}
+.scale button[aria-checked="true"]{background:var(--sel);color:var(--sel-ink);border-color:var(--sel)}
+.picked{min-height:3.2em;font-size:.88rem;color:var(--ink);background:var(--bg);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:2px}
+.picked .muted{font-size:.84rem}
+.picked .en{font-size:.92em}
+.legend{display:flex;justify-content:space-between;gap:8px;font-size:.78rem;font-weight:700;color:var(--muted)}
+details.all summary{cursor:pointer;font-size:.84rem;font-weight:700;color:var(--muted);min-height:36px;display:flex;align-items:center}
+details.all ol{margin:6px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px}
+details.all li{font-size:.86rem;display:flex;flex-direction:column;gap:2px}
+details.all li b{font-size:.84rem}
+.pill{display:inline-block;font-size:.8rem;font-weight:800;padding:3px 10px;border-radius:99px;background:var(--accent-soft);color:var(--ink);white-space:nowrap}
+.ladder{display:flex;gap:6px;margin-top:4px}
+.ladder span{flex:1;text-align:center;font-size:1.3rem;padding:6px 0;border-radius:10px;opacity:.4;border:1.5px solid transparent}
+.ladder span.on{opacity:1;background:color-mix(in srgb,var(--head-ink) 16%,transparent);border-color:var(--head-ink)}
+.hero .small{font-size:.8rem;opacity:.85}
+.how{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:.84rem;font-weight:700;margin-top:4px}
+.banner{display:flex;gap:10px;align-items:center;background:var(--good-soft);color:var(--good);border-radius:14px;padding:12px 14px;font-weight:800}
+.banner .en{color:inherit;opacity:.85;font-weight:600}
+.banner>span{font-size:1.5rem}
+.bottom{position:sticky;bottom:0;z-index:15;background:var(--bg);border-top:1px solid var(--line)}
+.bottom .wrap{padding-block:10px calc(10px + env(safe-area-inset-bottom,0px));display:flex;gap:10px}
+.bottom .btn{flex:1}
+.bottom .btn.alt{flex:0 0 32%}
+.total{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.total b{font-size:3rem;line-height:1;font-variant-numeric:tabular-nums}
+.rows{display:flex;flex-direction:column;gap:10px}
+.row{display:grid;grid-template-columns:1fr auto;gap:2px 10px;align-items:center}
+.row .nm{font-weight:600;min-width:0}
+.row .sc{font-variant-numeric:tabular-nums;font-weight:800}
+.meter{grid-column:1/-1;height:10px;border-radius:99px;background:var(--line);overflow:hidden}
+.meter i{display:block;height:100%;background:var(--zc);border-radius:99px}
+.tag{display:inline-block;font-size:.76rem;font-weight:800;padding:2px 8px;border-radius:99px;margin-left:6px;vertical-align:middle}
+.tag.up{background:var(--good-soft);color:var(--good)}
+.tag.dn{background:var(--warn-soft);color:var(--warn)}
+.act{border-left:4px solid var(--z3);padding:4px 0 4px 12px;display:flex;flex-direction:column;gap:4px}
+.codebox{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.82rem;word-break:break-all;background:var(--bg);border:1.5px dashed var(--line);border-radius:10px;padding:12px;user-select:all}
+.msgbox{white-space:pre-wrap;overflow-wrap:anywhere;font-size:.82rem;line-height:1.5;background:var(--bg);border:1.5px dashed var(--line);border-radius:10px;padding:12px;user-select:all}
+a.btn{display:flex;flex-direction:column;align-items:center;justify-content:center;text-decoration:none}
+.btn.wa{background:#1B7F46;color:#fff}
+.card.about{display:block}
+.about>*+*{margin-top:10px}
+.about summary{cursor:pointer;font-weight:800;min-height:44px;display:flex;align-items:center;gap:10px;list-style:none}
+.about summary::-webkit-details-marker{display:none}
+.about summary::after{content:"\25BE";margin-left:auto}
+.about[open] summary::after{content:"\25B4"}
+.about a,.credit a{color:inherit;text-decoration:underline;text-underline-offset:3px}
+.cmp{width:100%;border-collapse:collapse;font-size:.9rem}
+.cmp th,.cmp td{padding:6px 4px;border-bottom:1px solid var(--line);text-align:right;font-variant-numeric:tabular-nums}
+.cmp th:first-child,.cmp td:first-child{text-align:left}
+.cmp th{font-size:.76rem;color:var(--muted);font-weight:700}
+.scroll{overflow-x:auto}
+svg.radar{width:100%;height:auto;max-width:420px;margin:0 auto;display:block}
+svg.radar text{fill:var(--muted);font-family:var(--font)}
+.key{display:flex;gap:14px;flex-wrap:wrap;font-size:.82rem;justify-content:center}
+.key span{display:inline-flex;align-items:center;gap:6px}
+.key i{width:18px;height:0;border-top:3px solid var(--accent)}
+.key i.b{border-top:3px dashed var(--muted)}
+pre.out{margin:0;white-space:pre;overflow:auto;max-height:180px;font-size:.74rem;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px}
+.fac h3{margin-top:4px}
+.credit{font-size:.78rem;color:var(--muted)}
+.sr{position:absolute;left:-9999px}
+@media (prefers-reduced-motion: reduce){.prog .bar i{transition:none}}
+.keep{background:var(--warn-soft,#fff4d6);color:var(--ink);border:2px solid var(--warn,#e0a100);border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:8px}
+.keep p{margin:0;font-size:.9rem}
+.keep b{font-size:1rem}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .keep{background:#3a3114;border-color:#b98a00}}:root[data-theme="dark"] .keep{background:#3a3114;border-color:#b98a00}
+</style>
+
+<div id="root"></div>
+
+<script>
+(function(){
+'use strict';
+/* ================= Data: 30 statements (2 per competence), 5 levels each, Bahasa + English ================= */
+var D = {"areas": [{"id": "1", "emoji": "💡", "id_name": "Ide & Peluang", "en_name": "Ideas & Opportunities", "id_desc": "Melihat peluang, berpikir kreatif, dan menilai apakah sebuah ide layak diwujudkan.", "en_desc": "Spotting opportunities, thinking creatively, and judging whether an idea is worth pursuing."}, {"id": "2", "emoji": "🧰", "id_name": "Sumber Daya", "en_name": "Resources", "id_desc": "Mengenal diri sendiri, menjaga semangat, dan menggerakkan sumber daya, uang, serta orang lain.", "en_desc": "Knowing yourself, staying motivated, and mobilising resources, money and other people."}, {"id": "3", "emoji": "🚀", "id_name": "Beraksi", "en_name": "Into Action", "id_desc": "Memulai, merencanakan, menghadapi ketidakpastian, bekerja sama, dan belajar dari pengalaman.", "en_desc": "Starting, planning, coping with uncertainty, working with others, and learning from experience."}], "comps": [["1.1", "👀", "Mengenali Peluang", "Spotting Opportunities", "Catat 3 masalah kecil yang Anda temui hari ini.", "Note 3 small problems you come across today."], ["1.2", "🎨", "Kreativitas", "Creativity", "Tulis 10 cara baru memakai satu benda sehari-hari.", "List 10 new uses for one everyday object."], ["1.3", "🔭", "Visi", "Vision", "Selesaikan kalimat ini: \"Dalam 3 tahun, saya ingin ...\"", "Finish this sentence: \"In 3 years, I want ...\""], ["1.4", "💎", "Menilai Ide", "Valuing Ideas", "Tanyakan kepada 3 calon pengguna: \"Apakah ini berguna bagi Anda?\"", "Ask 3 likely users: \"Would this be useful to you?\""], ["1.5", "🌱", "Berpikir Etis & Berkelanjutan", "Ethical & Sustainable Thinking", "Untuk satu ide, tulis siapa yang diuntungkan dan siapa yang bisa dirugikan.", "For one idea, write who benefits and who might be harmed."], ["2.1", "🪞", "Kesadaran Diri & Keyakinan Diri", "Self-awareness & Self-efficacy", "Minta dua orang menyebutkan satu kekuatan Anda.", "Ask two people to name one of your strengths."], ["2.2", "🔥", "Motivasi & Ketekunan", "Motivation & Perseverance", "Tentukan satu target kecil minggu ini dan centang setiap hari.", "Set one small target this week and tick it off daily."], ["2.3", "🧩", "Menggerakkan Sumber Daya", "Mobilising Resources", "Buat daftar \"yang sudah saya punya\" (orang, alat, ruang) sebelum mencari yang baru.", "Make a list of \"what I already have\" (people, tools, space) before looking for more."], ["2.4", "💰", "Literasi Keuangan & Ekonomi", "Financial & Economic Literacy", "Hitung biaya satu kegiatan kecil (misalnya acara kelas) dalam tabel sederhana.", "Cost one small activity (e.g. a class event) in a simple table."], ["2.5", "📣", "Menggerakkan Orang Lain", "Mobilising Others", "Latih penjelasan ide Anda selama 60 detik kepada satu teman.", "Practise a 60-second explanation of your idea with one friend."], ["3.1", "⚡", "Berinisiatif", "Taking the Initiative", "Mulai satu hal kecil yang lama tertunda, dalam 24 jam ke depan.", "Start one small thing you have been putting off, within the next 24 hours."], ["3.2", "📋", "Perencanaan & Pengelolaan", "Planning & Management", "Pecah satu tujuan menjadi 5 langkah, masing-masing dengan tanggal.", "Break one goal into 5 steps, each with a date."], ["3.3", "🎲", "Menghadapi Ketidakpastian & Risiko", "Coping with Uncertainty, Ambiguity & Risk", "Lakukan satu percobaan kecil yang kalau gagal tidak merugikan.", "Run one small experiment where failing costs very little."], ["3.4", "🤝", "Bekerja dengan Orang Lain", "Working with Others", "Ajak satu orang dari bidang yang berbeda mengobrol 20 menit.", "Invite one person from a different field for a 20-minute chat."], ["3.5", "🔄", "Belajar dari Pengalaman", "Learning through Experience", "Setiap Jumat, tulis: \"Apa yang saya pelajari minggu ini?\"", "Every Friday, write: \"What did I learn this week?\""]], "items": [[{"se": "I can identify opportunities for creating value for different people, my community or my surroundings.", "si": "Saya bisa melihat peluang untuk menciptakan manfaat bagi orang lain, komunitas, atau lingkungan sekitar saya.", "le": ["I know opportunities exist around me, but I need help to see them.", "I am starting to notice needs around me, often when others point them out.", "I spot some opportunities myself and test whether they are worth pursuing.", "I regularly spot opportunities for others and take responsibility for acting on some.", "I find opportunities that create value for many people and help others see them."], "li": ["Saya tahu peluang itu ada di sekitar saya, tetapi saya perlu bantuan untuk melihatnya.", "Saya mulai memperhatikan kebutuhan di sekitar saya, biasanya setelah orang lain menunjukkannya.", "Saya menemukan beberapa peluang sendiri dan mencoba menguji apakah layak dikejar.", "Saya rutin melihat peluang bagi orang lain dan berani bertanggung jawab mewujudkan sebagian.", "Saya menemukan peluang yang bermanfaat bagi banyak orang dan membantu orang lain melihatnya."]}, {"se": "I can identify challenges that come from the different needs and interests of different people.", "si": "Saya bisa mengenali tantangan yang muncul karena kebutuhan dan kepentingan orang yang berbeda-beda.", "le": ["I know people want different things, but I need help to see the problems this causes.", "I am starting to see where people's needs clash, with guidance.", "I can spot clashes between people's needs, alone or with others.", "I notice these challenges early and help share the work of addressing them.", "I handle complex clashes between needs and help find balanced solutions."], "li": ["Saya tahu orang menginginkan hal berbeda, tetapi saya perlu bantuan untuk melihat masalah yang timbul.", "Saya mulai melihat di mana kebutuhan orang saling bertabrakan, dengan bimbingan.", "Saya bisa melihat benturan kebutuhan antarorang, sendiri atau bersama orang lain.", "Saya menyadari tantangan ini sejak dini dan ikut membagi kerja untuk mengatasinya.", "Saya menangani benturan kebutuhan yang rumit dan membantu menemukan solusi yang seimbang."]}], [{"se": "I can develop, lead and finish a creative process.", "si": "Saya bisa mengembangkan, memimpin, dan menyelesaikan sebuah proses kreatif.", "le": ["I am just starting and need guidance to follow a creative process.", "I join creative activities and begin to contribute, with support.", "I carry out a creative process from start to finish, alone or with a team.", "I lead a creative process through to a result and take responsibility for it.", "I lead creative processes on complex challenges and improve how others work creatively."], "li": ["Saya baru mulai dan perlu bimbingan untuk mengikuti proses kreatif.", "Saya ikut kegiatan kreatif dan mulai berkontribusi dengan dukungan orang lain.", "Saya menjalankan proses kreatif dari awal sampai akhir, sendiri atau bersama tim.", "Saya memimpin proses kreatif sampai ada hasil dan bertanggung jawab atasnya.", "Saya memimpin proses kreatif untuk tantangan yang rumit dan membantu orang lain berkreasi lebih baik."]}, {"se": "I can use several creative techniques (such as brainstorming and problem-solving methods) to create value for my community.", "si": "Saya bisa memakai beberapa teknik kreatif (misalnya curah pendapat dan metode pemecahan masalah) untuk menciptakan manfaat bagi komunitas saya.", "le": ["I have heard of creative techniques but have not used them.", "I try one or two techniques with guidance.", "I choose and use different techniques on my own to solve real problems.", "I confidently pick the right technique and use it to create value for others.", "I combine and adapt techniques, and teach others to use them."], "li": ["Saya pernah mendengar teknik kreatif, tetapi belum pernah memakainya.", "Saya mencoba satu atau dua teknik dengan bimbingan.", "Saya memilih dan memakai berbagai teknik sendiri untuk memecahkan masalah nyata.", "Saya percaya diri memilih teknik yang tepat dan memakainya untuk menciptakan manfaat bagi orang lain.", "Saya menggabungkan dan menyesuaikan teknik, serta mengajarkannya kepada orang lain."]}], [{"se": "I can change what I do to reach my goals.", "si": "Saya bisa mengubah apa yang saya lakukan untuk mencapai tujuan saya.", "le": ["I know I need goals, but I need help to adjust what I do.", "I start to change my actions when things are not working, with guidance.", "I try different actions on my own to move toward my goals.", "I regularly adjust my actions to stay on track and take responsibility for results.", "I redirect my own and others' efforts toward ambitious goals as conditions change."], "li": ["Saya tahu saya perlu tujuan, tetapi saya perlu bantuan untuk menyesuaikan tindakan saya.", "Saya mulai mengubah tindakan ketika sesuatu tidak berjalan, dengan bimbingan.", "Saya mencoba tindakan berbeda sendiri untuk mendekati tujuan saya.", "Saya rutin menyesuaikan tindakan agar tetap di jalur dan bertanggung jawab atas hasilnya.", "Saya mengarahkan ulang upaya saya dan orang lain menuju tujuan besar ketika keadaan berubah."]}, {"se": "I can explain the value of a new idea from the point of view of different people.", "si": "Saya bisa menjelaskan nilai sebuah ide baru dari sudut pandang orang yang berbeda-beda.", "le": ["I can describe an idea but need help to see it through other people's eyes.", "I am starting to ask others what they think the idea is worth.", "I can explain an idea's value to a few different kinds of people.", "I explain an idea's value convincingly to different people and adjust my message.", "I bring many people's interests together around an idea's shared value."], "li": ["Saya bisa menceritakan sebuah ide, tetapi perlu bantuan untuk melihatnya lewat mata orang lain.", "Saya mulai bertanya kepada orang lain tentang nilai ide itu menurut mereka.", "Saya bisa menjelaskan nilai sebuah ide kepada beberapa jenis orang.", "Saya menjelaskan nilai sebuah ide dengan meyakinkan kepada berbagai orang dan menyesuaikan pesan saya.", "Saya mempertemukan kepentingan banyak orang di sekitar nilai bersama dari sebuah ide."]}], [{"se": "I can decide what kind of value (cultural, social or economic) I want to create for my community.", "si": "Saya bisa menentukan jenis manfaat (budaya, sosial, atau ekonomi) yang ingin saya ciptakan bagi komunitas saya.", "le": ["I know ideas can create different kinds of value, but I need help to choose.", "I explore which kinds of value matter to my community, with guidance.", "I choose the kind of value I want to create and can explain why.", "I set clear value goals for my community and take responsibility for them.", "I create value in several ways at once and help others define theirs."], "li": ["Saya tahu ide bisa menciptakan berbagai jenis manfaat, tetapi saya perlu bantuan untuk memilih.", "Saya menjajaki jenis manfaat apa yang penting bagi komunitas saya, dengan bimbingan.", "Saya memilih jenis manfaat yang ingin saya ciptakan dan bisa menjelaskan alasannya.", "Saya menetapkan tujuan manfaat yang jelas bagi komunitas saya dan bertanggung jawab atasnya.", "Saya menciptakan beberapa jenis manfaat sekaligus dan membantu orang lain menentukan manfaat mereka."]}, {"se": "I can protect my ideas and inventions (for example with copyright or other intellectual property rights).", "si": "Saya bisa melindungi ide dan karya saya (misalnya dengan hak cipta atau hak kekayaan intelektual lainnya).", "le": ["I have heard of protecting ideas but do not know how.", "I am learning the basics of protecting ideas, with help.", "I can use basic ways to protect my own ideas.", "I know which kind of protection suits my idea and take care of it.", "I manage protection for complex ideas and advise others."], "li": ["Saya pernah mendengar tentang perlindungan ide, tetapi belum tahu caranya.", "Saya sedang belajar dasar-dasar melindungi ide, dengan bantuan.", "Saya bisa memakai cara-cara dasar untuk melindungi ide saya sendiri.", "Saya tahu jenis perlindungan yang cocok untuk ide saya dan mengurusnya.", "Saya mengelola perlindungan untuk ide yang kompleks dan menasihati orang lain."]}], [{"se": "I can behave ethically and responsibly, both as a consumer and when producing things.", "si": "Saya bisa bersikap etis dan bertanggung jawab, baik sebagai konsumen maupun saat membuat atau menghasilkan sesuatu.", "le": ["I know ethics matter, but I need guidance to apply them to daily choices.", "I am starting to consider the effect of my choices on others, with guidance.", "I try to make ethical choices on my own, as a consumer and as a producer.", "I consistently act responsibly and take responsibility for my choices.", "I set an example of ethical and responsible practice and influence others."], "li": ["Saya tahu etika itu penting, tetapi saya perlu bimbingan untuk menerapkannya dalam pilihan sehari-hari.", "Saya mulai mempertimbangkan dampak pilihan saya bagi orang lain, dengan bimbingan.", "Saya berusaha membuat pilihan etis sendiri, sebagai konsumen maupun pembuat.", "Saya konsisten bertindak bertanggung jawab dan menanggung pilihan saya.", "Saya menjadi teladan praktik etis dan bertanggung jawab serta memengaruhi orang lain."]}, {"se": "I can assess the impact and effectiveness of my own actions from an ethical point of view.", "si": "Saya bisa menilai dampak dan efektivitas tindakan saya sendiri dari sudut pandang etika.", "le": ["I need help to see how my actions affect other people.", "I begin to reflect on the effects of my actions, with support.", "I assess the ethical effects of my own actions by myself.", "I regularly check whether my actions are ethical and effective, and improve them.", "I evaluate complex impacts and help others judge theirs."], "li": ["Saya perlu bantuan untuk melihat bagaimana tindakan saya memengaruhi orang lain.", "Saya mulai merenungkan dampak tindakan saya, dengan dukungan.", "Saya menilai dampak etis dari tindakan saya sendiri.", "Saya rutin memeriksa apakah tindakan saya etis dan efektif, lalu memperbaikinya.", "Saya menilai dampak yang rumit dan membantu orang lain menilai dampak mereka."]}], [{"se": "I can identify my needs, my wants and the areas I need to develop.", "si": "Saya bisa mengenali kebutuhan, keinginan, dan hal-hal yang perlu saya kembangkan.", "le": ["I need help to see what I need or want to develop.", "I can name some strengths and gaps, usually after feedback from others.", "I identify my needs and development areas on my own.", "I know my needs and gaps well and act on them.", "I track my growth over time and help others do the same."], "li": ["Saya perlu bantuan untuk melihat apa yang saya butuhkan atau ingin kembangkan.", "Saya bisa menyebut beberapa kekuatan dan kekurangan saya, biasanya setelah mendapat masukan.", "Saya mengenali kebutuhan dan hal yang perlu dikembangkan dari diri saya sendiri.", "Saya mengenal kebutuhan dan kekurangan saya dengan baik dan bertindak berdasarkan itu.", "Saya memantau perkembangan diri dari waktu ke waktu dan membantu orang lain melakukannya."]}, {"se": "I believe I can influence people and situations through my own actions.", "si": "Saya percaya saya bisa memengaruhi orang dan keadaan lewat tindakan saya sendiri.", "le": ["I am not sure my actions make a difference.", "I am starting to see that my actions can change small things.", "I believe my actions can influence people around me, and I test this.", "I am confident my actions make a difference and I act on that.", "I influence people and situations with confidence, even under difficult conditions."], "li": ["Saya belum yakin tindakan saya membawa perbedaan.", "Saya mulai melihat bahwa tindakan saya bisa mengubah hal-hal kecil.", "Saya percaya tindakan saya bisa memengaruhi orang di sekitar saya, dan saya mengujinya.", "Saya yakin tindakan saya membawa perbedaan dan saya bertindak berdasarkan keyakinan itu.", "Saya percaya diri memengaruhi orang dan keadaan, bahkan dalam kondisi sulit."]}], [{"se": "I can identify the inner and outer factors that motivate me to create value for others (social, cultural or economic).", "si": "Saya bisa mengenali hal-hal dari dalam dan luar diri yang memotivasi saya menciptakan manfaat bagi orang lain (sosial, budaya, atau ekonomi).", "le": ["I need help to understand what motivates me.", "I can name a few things that motivate me when prompted.", "I know several things that motivate me and how they link to creating value.", "I understand my motivation well and use it to keep creating value for others.", "I use my motivation to inspire others and sustain long-term value creation."], "li": ["Saya perlu bantuan untuk memahami apa yang memotivasi saya.", "Saya bisa menyebut beberapa hal yang memotivasi saya jika diberi pancingan.", "Saya tahu beberapa hal yang memotivasi saya dan kaitannya dengan menciptakan manfaat.", "Saya memahami motivasi saya dengan baik dan memakainya untuk terus menciptakan manfaat bagi orang lain.", "Saya memakai motivasi saya untuk menginspirasi orang lain dan menjaga manfaat jangka panjang."]}, {"se": "I can keep going in all situations, even when facing difficulties.", "si": "Saya bisa terus melangkah dalam situasi apa pun, termasuk saat menghadapi kesulitan.", "le": ["I tend to stop when things get hard unless someone supports me.", "I keep trying for a while with encouragement from others.", "I usually carry on through difficulties on my own.", "I persist through setbacks and help my team keep going.", "I stay resilient under heavy pressure and help others recover from failure."], "li": ["Saya cenderung berhenti ketika keadaan sulit, kecuali ada yang mendukung saya.", "Saya terus mencoba beberapa saat jika diberi semangat oleh orang lain.", "Saya biasanya melanjutkan walaupun sulit, tanpa harus didorong.", "Saya bertahan melewati kegagalan dan membantu tim saya tetap berjalan.", "Saya tetap tangguh di bawah tekanan berat dan membantu orang lain bangkit dari kegagalan."]}], [{"se": "I can get and manage the different resources (such as materials, money or people's time) needed to turn my ideas into action.", "si": "Saya bisa mendapatkan dan mengelola berbagai sumber daya (seperti bahan, uang, atau waktu orang lain) yang dibutuhkan untuk mewujudkan ide saya.", "le": ["I know ideas need resources, but I need help to identify them.", "I list what I need and get help to find it.", "I find and manage some resources myself for a small activity.", "I get and manage the resources my activity needs, and answer for how they are used.", "I mobilise and manage resources for large or complex activities."], "li": ["Saya tahu ide butuh sumber daya, tetapi saya perlu bantuan untuk menentukannya.", "Saya mendaftar apa yang saya butuhkan dan dibantu mencarinya.", "Saya menemukan dan mengelola beberapa sumber daya sendiri untuk kegiatan kecil.", "Saya mendapatkan dan mengelola sumber daya yang dibutuhkan kegiatan saya dan bertanggung jawab atas pemakaiannya.", "Saya menggerakkan dan mengelola sumber daya untuk kegiatan besar atau rumit."]}, {"se": "I can use public and private services (such as advisers, consultants, or peer and mentor support) to turn my idea into action.", "si": "Saya bisa memanfaatkan layanan publik dan swasta (seperti penasihat, konsultan, atau dukungan teman sebaya dan mentor) untuk mewujudkan ide saya.", "le": ["I do not know what support is available.", "I know some sources of support and ask for help when guided.", "I seek out advisers, mentors or services on my own.", "I use the right support for each stage of my idea.", "I build lasting partnerships with services and mentors and connect others to them."], "li": ["Saya belum tahu dukungan apa saja yang tersedia.", "Saya tahu beberapa sumber dukungan dan meminta bantuan saat diarahkan.", "Saya mencari penasihat, mentor, atau layanan sendiri.", "Saya memakai dukungan yang tepat untuk setiap tahap ide saya.", "Saya membangun kemitraan jangka panjang dengan layanan dan mentor serta menghubungkan orang lain dengannya."]}], [{"se": "I can estimate and calculate the cost of turning my idea into an activity.", "si": "Saya bisa memperkirakan dan menghitung biaya untuk mewujudkan ide saya menjadi sebuah kegiatan.", "le": ["I need help to work out what an idea would cost.", "I list costs with guidance.", "I estimate the main costs of a small activity on my own.", "I calculate realistic costs for my activity and take responsibility for the budget.", "I forecast costs for complex activities and test different scenarios."], "li": ["Saya perlu bantuan untuk menghitung berapa biaya sebuah ide.", "Saya mendaftar biaya dengan bimbingan.", "Saya memperkirakan biaya utama sebuah kegiatan kecil sendiri.", "Saya menghitung biaya yang realistis untuk kegiatan saya dan bertanggung jawab atas anggarannya.", "Saya memperkirakan biaya kegiatan yang rumit dan menguji berbagai skenario."]}, {"se": "I can estimate how my financial decisions (such as investing or buying assets and goods) affect my overall finances.", "si": "Saya bisa memperkirakan bagaimana keputusan keuangan saya (seperti berinvestasi atau membeli aset dan barang) memengaruhi keuangan saya secara keseluruhan.", "le": ["I need help to see how one financial decision affects the rest.", "I think about the effects of simple financial decisions, with support.", "I estimate the effects of my financial decisions on my overall situation.", "I weigh financial decisions against my overall finances before acting.", "I plan financial decisions over the long term and help others do the same."], "li": ["Saya perlu bantuan untuk melihat bagaimana satu keputusan keuangan memengaruhi hal lainnya.", "Saya memikirkan dampak keputusan keuangan sederhana, dengan dukungan.", "Saya memperkirakan dampak keputusan keuangan terhadap keadaan keuangan saya secara keseluruhan.", "Saya menimbang keputusan keuangan terhadap keuangan saya secara keseluruhan sebelum bertindak.", "Saya merencanakan keputusan keuangan jangka panjang dan membantu orang lain melakukannya."]}], [{"se": "I can lead by example.", "si": "Saya bisa memimpin lewat teladan.", "le": ["I am learning what leading by example means and need guidance.", "I sometimes show others what to do, with encouragement.", "I try to lead by example in my group.", "I lead by example and others follow my lead.", "I inspire and develop other leaders, and my example shapes my group's culture."], "li": ["Saya sedang belajar apa artinya memimpin lewat teladan dan perlu bimbingan.", "Kadang saya menunjukkan kepada orang lain apa yang harus dilakukan, dengan dorongan.", "Saya berusaha memberi teladan di kelompok saya.", "Saya memimpin lewat teladan dan orang lain mengikuti.", "Saya menginspirasi dan menumbuhkan pemimpin lain, dan teladan saya membentuk budaya kelompok."]}, {"se": "I can pitch effectively to partners, networks, supporters, investors, the media and other stakeholders.", "si": "Saya bisa mempresentasikan ide secara efektif kepada mitra, jaringan, pendukung, investor, media, dan pihak berkepentingan lainnya.", "le": ["I have never pitched and need help to explain my idea.", "I explain my idea to friends or classmates, with guidance.", "I prepare and give a short pitch on my own.", "I pitch convincingly to people whose support I need, and adjust to my audience.", "I pitch to large or sceptical audiences and win real commitment."], "li": ["Saya belum pernah mempresentasikan ide dan perlu bantuan untuk menjelaskannya.", "Saya menjelaskan ide saya kepada teman atau teman sekelas, dengan bimbingan.", "Saya menyiapkan dan membawakan presentasi singkat sendiri.", "Saya mempresentasikan ide dengan meyakinkan kepada orang yang dukungannya saya perlukan, sesuai audiensnya.", "Saya mempresentasikan ide kepada audiens besar atau skeptis dan memperoleh komitmen nyata."]}], [{"se": "I can solve problems in my group (my class, team, workplace or community).", "si": "Saya bisa memecahkan masalah di kelompok saya (kelas, tim, tempat kerja, atau komunitas).", "le": ["I know my group has problems, but I need help to recognise them.", "I am starting to spot problems and rely on others to help me understand them.", "I identify some problems and work on solving them, alone or with others.", "I recognise and solve problems in my group, working with others where needed.", "I take responsibility for finding and fixing problems, including complex ones."], "li": ["Saya tahu kelompok saya punya masalah, tetapi saya perlu bantuan untuk mengenalinya.", "Saya mulai melihat masalah dan masih bergantung pada orang lain untuk memahaminya.", "Saya mengenali beberapa masalah dan mengerjakan solusinya, sendiri atau bersama orang lain.", "Saya mengenali dan memecahkan masalah di kelompok saya, bekerja sama bila perlu.", "Saya bertanggung jawab menemukan dan memperbaiki masalah, termasuk yang rumit."]}, {"se": "I can start activities that matter for the goals of my group.", "si": "Saya bisa memulai kegiatan yang penting bagi tujuan kelompok saya.", "le": ["I know my group wants to do important things, but I need help to get started.", "I start simple activities with guidance from others.", "I start activities that matter for my group, alone or with others.", "I regularly start valuable activities and make sure they fit our goals.", "I launch complex projects and drive them to success."], "li": ["Saya tahu kelompok saya ingin melakukan hal penting, tetapi saya perlu bantuan untuk memulai.", "Saya memulai kegiatan sederhana dengan bimbingan orang lain.", "Saya memulai kegiatan yang penting bagi kelompok saya, sendiri atau bersama orang lain.", "Saya rutin memulai kegiatan bermanfaat dan memastikannya sesuai tujuan kami.", "Saya meluncurkan proyek yang rumit dan mengantarkannya sampai berhasil."]}], [{"se": "I can make an action plan with the most important steps to reach my goals.", "si": "Saya bisa menyusun rencana aksi dengan langkah-langkah terpenting untuk mencapai tujuan saya.", "le": ["I need help to break a goal into steps.", "I make simple plans with guidance.", "I write my own action plan with the main steps.", "I make realistic plans, prioritise the key steps and follow them through.", "I plan complex projects and coordinate other people's steps."], "li": ["Saya perlu bantuan untuk memecah tujuan menjadi langkah-langkah.", "Saya membuat rencana sederhana dengan bimbingan.", "Saya menulis rencana aksi sendiri dengan langkah-langkah utamanya.", "Saya membuat rencana yang realistis, memprioritaskan langkah kunci, dan menjalankannya sampai selesai.", "Saya merencanakan proyek yang rumit dan mengoordinasikan langkah orang lain."]}, {"se": "I can change my priorities when conditions change.", "si": "Saya bisa mengubah prioritas saat keadaan berubah.", "le": ["When things change I need help to know what to do first.", "I adjust my plans when someone helps me see the change.", "I reorder my priorities on my own when something changes.", "I adapt plans quickly when conditions change and keep things moving.", "I redirect plans in fast-changing conditions and guide others through the change."], "li": ["Saat keadaan berubah, saya perlu bantuan untuk tahu apa yang harus didahulukan.", "Saya menyesuaikan rencana ketika ada yang membantu saya melihat perubahannya.", "Saya menata ulang prioritas sendiri saat ada yang berubah.", "Saya cepat menyesuaikan rencana saat keadaan berubah dan menjaga pekerjaan tetap berjalan.", "Saya mengarahkan ulang rencana di situasi yang cepat berubah dan membimbing orang lain melewati perubahan itu."]}], [{"se": "I am not afraid of trying new things.", "si": "Saya tidak takut mencoba hal-hal baru.", "le": ["New things feel uncomfortable and I prefer familiar ways.", "I try new things when others encourage me.", "I try new things on my own and learn from the results.", "I am comfortable trying new things and take responsibility for the outcome.", "I seek out unfamiliar challenges and encourage others to try them."], "li": ["Hal baru terasa tidak nyaman dan saya lebih suka cara yang sudah biasa.", "Saya mencoba hal baru jika orang lain menyemangati saya.", "Saya mencoba hal baru sendiri dan belajar dari hasilnya.", "Saya nyaman mencoba hal baru dan bertanggung jawab atas hasilnya.", "Saya mencari tantangan yang belum dikenal dan mendorong orang lain untuk mencobanya."]}, {"se": "I can make choices, assess risks and decide in uncertain situations.", "si": "Saya bisa memilih, menilai risiko, dan mengambil keputusan dalam situasi yang tidak pasti.", "le": ["I find it hard to decide when things are uncertain.", "I decide with support when information is missing.", "I make decisions in uncertain situations myself and learn from them.", "I make considered decisions with incomplete information and stand by them.", "I lead decisions in very uncertain situations, balancing risk and opportunity."], "li": ["Saya sulit memutuskan ketika keadaan tidak pasti.", "Saya memutuskan dengan dukungan ketika informasi kurang.", "Saya mengambil keputusan sendiri dalam situasi tidak pasti dan belajar darinya.", "Saya membuat keputusan yang matang dengan informasi terbatas dan berdiri di belakangnya.", "Saya memimpin pengambilan keputusan dalam situasi yang sangat tidak pasti, menyeimbangkan risiko dan peluang."]}], [{"se": "I can develop ideas together with different kinds of people and teams.", "si": "Saya bisa mengembangkan ide bersama berbagai macam orang dan tim.", "le": ["I prefer to work alone, or I need help to work with new people.", "I contribute ideas in a team, with guidance.", "I develop ideas with people from different backgrounds, on my own initiative.", "I work well with a variety of people and teams to develop ideas.", "I bring diverse people together to develop ideas on a larger scale."], "li": ["Saya lebih suka bekerja sendiri, atau perlu bantuan untuk bekerja dengan orang baru.", "Saya menyumbang ide dalam tim, dengan bimbingan.", "Saya mengembangkan ide bersama orang dari latar belakang berbeda atas inisiatif sendiri.", "Saya bekerja dengan baik bersama berbagai orang dan tim untuk mengembangkan ide.", "Saya mempertemukan beragam orang untuk mengembangkan ide dalam skala yang lebih besar."]}, {"se": "I can work through disagreements and share tasks fairly in a team.", "si": "Saya bisa menyelesaikan perbedaan pendapat dan membagi tugas secara adil dalam tim.", "le": ["Disagreements in a team are hard for me and I need help.", "I work through small disagreements with guidance.", "I resolve disagreements and share tasks fairly on my own.", "I handle conflict and competition constructively and keep the team moving.", "I resolve complex conflicts and help teams work well together."], "li": ["Perbedaan pendapat dalam tim terasa sulit bagi saya dan saya perlu bantuan.", "Saya menyelesaikan perbedaan kecil dengan bimbingan.", "Saya menyelesaikan perbedaan pendapat dan membagi tugas secara adil sendiri.", "Saya menangani konflik dan persaingan secara konstruktif dan menjaga tim tetap bergerak.", "Saya menyelesaikan konflik yang rumit dan membantu tim bekerja dengan baik."]}], [{"se": "I can reflect on my successes and failures and learn from them.", "si": "Saya bisa merenungkan keberhasilan dan kegagalan saya, lalu belajar darinya.", "le": ["I rarely look back on what went well or badly.", "I reflect on results with guidance, especially on mistakes.", "I reflect on my successes and failures on my own.", "I regularly reflect, learn from failure and change my approach.", "I make reflection a habit in my team and turn failure into improvement."], "li": ["Saya jarang menengok kembali apa yang berjalan baik atau buruk.", "Saya merenungkan hasil dengan bimbingan, terutama soal kesalahan.", "Saya merenungkan keberhasilan dan kegagalan saya sendiri.", "Saya rutin merenung, belajar dari kegagalan, dan mengubah cara kerja saya.", "Saya menjadikan refleksi kebiasaan di tim saya dan mengubah kegagalan menjadi perbaikan."]}, {"se": "I can improve how I create value or develop an idea by using my earlier experience.", "si": "Saya bisa memperbaiki cara saya menciptakan manfaat atau mengembangkan ide dengan memakai pengalaman saya sebelumnya.", "le": ["I need help to connect past experience to new work.", "I use lessons from earlier experience when someone reminds me.", "I apply earlier lessons to improve my next attempt.", "I regularly build on earlier experience to improve my results.", "I turn experience into better methods that others can use."], "li": ["Saya perlu bantuan untuk menghubungkan pengalaman lalu dengan pekerjaan baru.", "Saya memakai pelajaran dari pengalaman sebelumnya ketika ada yang mengingatkan.", "Saya menerapkan pelajaran sebelumnya untuk memperbaiki percobaan berikutnya.", "Saya rutin membangun dari pengalaman sebelumnya untuk memperbaiki hasil saya.", "Saya mengubah pengalaman menjadi cara kerja yang lebih baik dan bisa dipakai orang lain."]}]], "levels": [{"key": "Discover", "emoji": "🌱", "id": "Menemukan", "en": "Discover", "tag_id": "Awal yang bagus", "tag_en": "A great place to start", "id_desc": "Anda baru mulai mengenali dunia wirausaha. Banyak ruang untuk tumbuh, dan itu kabar baik!", "en_desc": "You are just starting to notice the world of enterprise. Lots of room to grow, and that's good news!"}, {"key": "Explore", "emoji": "🧭", "id": "Menjelajah", "en": "Explore", "tag_id": "Sedang menemukan jalan", "tag_en": "Finding your way", "id_desc": "Anda mulai mencoba dan belajar. Sebagian kebiasaan sudah terbentuk; teruskan dengan percobaan kecil.", "en_desc": "You are starting to try things and learn. Some habits are forming; keep going with small experiments."}, {"key": "Experiment", "emoji": "🧪", "id": "Bereksperimen", "en": "Experiment", "tag_id": "Sudah mencoba sendiri", "tag_en": "Trying it yourself", "id_desc": "Anda sudah sering mempraktikkan sikap dan keterampilan ini sendiri. Saatnya menantang diri dengan proyek nyata.", "en_desc": "You often practise these attitudes and skills on your own. Time to challenge yourself with a real project."}, {"key": "Dare", "emoji": "🦁", "id": "Berani", "en": "Dare", "tag_id": "Berani bertindak", "tag_en": "Acting with confidence", "id_desc": "Anda percaya diri bertindak dan berani bertanggung jawab atas hasilnya. Langkah berikutnya: mengajak orang lain tumbuh bersama.", "en_desc": "You act with confidence and take responsibility for the results. Next step: helping others grow with you."}, {"key": "Beyond", "emoji": "🚀", "id": "Melampaui", "en": "Beyond Dare", "tag_id": "Memimpin dan menumbuhkan orang lain", "tag_en": "Leading and lifting others", "id_desc": "Anda sudah memimpin dan menumbuhkan orang lain. Tantangan berikutnya: menciptakan dampak yang lebih luas.", "en_desc": "You already lead and lift others. Your next adventure: creating wider impact."}], "reflect": [["Apa satu hal yang membuat saya terkejut dari hasil ini?", "What is one thing that surprised me about these results?"], ["Kekuatan super mana yang bisa saya pakai untuk membantu orang lain atau proyek saya?", "Which superpower could I use to help other people or my own project?"], ["Titik tumbuh mana yang paling ingin saya kembangkan, dan siapa yang bisa membantu saya?", "Which growth spot do I most want to develop, and who could help me?"]]};
+/* WA_NUMBER: the facilitator's WhatsApp number, international format, digits only (e.g. 6281234567890 for Indonesia,
+   447700900123 for the UK). Leave empty and WhatsApp lets the student choose who to send the message to.
+   FORM_URL / FORM_ENTRY: optional Google Form (viewform link and entry id). Leave empty if you only use WhatsApp. */
+var CONFIG = { WA_NUMBER: '', FORM_URL: '', FORM_ENTRY: '' };
+
+var NI=2, NT=30;           /* statements per competence, total statements */
+var KEY='ec-compass-v3', HKEY='ec-compass-hist-v3';
+var mem = {};
+var store = {
+  get:function(k){ try{ var v=localStorage.getItem(k); return v==null?(mem[k]==null?null:mem[k]):v; }catch(e){ return mem[k]==null?null:mem[k]; } },
+  set:function(k,v){ mem[k]=v; try{ localStorage.setItem(k,v); }catch(e){} },
+  del:function(k){ delete mem[k]; try{ localStorage.removeItem(k); }catch(e){} }
+};
+
+/* ================= State ================= */
+function blank(){ return {lang:'both',screen:'welcome',name:'',warn:'',role:'',round:'',date:'',answers:Array(NT).fill(0),step:0,plan:['','',''],reflect:['','',''],cmp:null,cmpMsg:'',confirm:false,err:'',openText:'',openErr:'',cmpText:''}; }
+var S = blank();
+var OPEN = {};             /* which "see all levels" panels are open (not saved) */
+(function load(){
+  try{ var raw=store.get(KEY); if(raw){ var o=JSON.parse(raw); if(o && o.answers && o.answers.length===NT){ var b=blank(); for(var k in b){ if(o[k]!==undefined) b[k]=o[k]; } S=b; S.confirm=false; S.err=''; S.warn=''; S.openErr=''; S.cmpMsg=''; } } }catch(e){}
+})();
+function save(){ try{ store.set(KEY, JSON.stringify(S)); }catch(e){} }
+function hist(){ try{ return JSON.parse(store.get(HKEY)||'{}'); }catch(e){ return {}; } }
+function histSet(k,v){ var h=hist(); h[k]=v; store.set(HKEY, JSON.stringify(h)); }
+
+/* ================= Scoring: every statement is a level 1..5; competence = mean of its 2 statements ================= */
+function mean(a){ return a.length? a.reduce(function(x,y){return x+y;},0)/a.length : 0; }
+function scores(a){ var c=[],k; for(k=0;k<15;k++){ c.push((a[NI*k]+a[NI*k+1])/2); }
+  var z=[0,1,2].map(function(i){ return mean(c.slice(5*i,5*i+5)); });
+  return {c:c,z:z,t:mean(c)}; }
+function lvlIdx(avg){ return Math.min(4,Math.max(0,Math.floor(avg+0.5+1e-9)-1)); }
+function f1(x){ return (Math.round(x*10)/10).toFixed(1); }
+function f2(x){ return (Math.round(x*100)/100).toFixed(2); }
+function ranks(c){ var o=c.map(function(s,i){return {i:i,key:s+(100-i)/100000};}).sort(function(a,b){return b.key-a.key;}); var r=[]; o.forEach(function(x,n){ r[x.i]=n+1; }); return r; }
+/* 'up' = one of the 3 strongest and at or above your own average; 'dn' = one of the 3 lowest and at or below it; nothing if the profile is flat */
+function tagsFor(sc){ var rk=ranks(sc.c), mn=Math.min.apply(null,sc.c), mx=Math.max.apply(null,sc.c);
+  return sc.c.map(function(s,i){ if(mx===mn) return ''; if(rk[i]<=3 && s>=sc.t) return 'up'; if(rk[i]>=13 && s<=sc.t) return 'dn'; return ''; }); }
+function answered(a){ return a.filter(function(v){return v>0;}).length; }
+
+/* ================= Name and result message ================= */
+var RX=(function(){ try{ return {m:new RegExp('\\p{M}','gu'), n:new RegExp('[^\\p{L}\\p{N}]','gu')}; }catch(e){ return {m:/[\u0300-\u036f]/g, n:/[^a-z0-9]/g}; } })();
+/* Matching key: same person if the key is the same. Ignores capitals, spaces, punctuation and accents. */
+function nkey(name){ var s=String(name||''); try{ s=s.normalize('NFD'); }catch(e){} return s.replace(RX.m,'').toLowerCase().replace(RX.n,''); }
+function cleanName(t){ return String(t||'').replace(/[|\r\n\t]/g,' ').replace(/\s+/g,' ').trim().slice(0,24); }
+function chk(a){ var s=0; a.forEach(function(v,i){ s+=v*(i+1); }); return (s%36).toString(36).toUpperCase(); }
+/* Machine line inside the WhatsApp message: EC3|name|role|round|YYMMDD|30 levels (1-5)|check */
+function encode(st){ var d=st.date?st.date.replace(/-/g,'').slice(2):'000000'; return ['EC3',cleanName(st.name),st.role,st.round,d,st.answers.join(''),chk(st.answers)].join('|'); }
+var DEC=/EC3\|([^|\r\n]{1,24})\|([SLO])\|([BA])\|(\d{6})\|([1-5]{30})\|([0-9A-Z])/i;
+function decode(text){
+  var raw=String(text||''), m=DEC.exec(raw);
+  if(!m){ var s2=raw.replace(/\s*\|\s*/g,'|').replace(/(\d)[ \t\r\n]+(?=[\d|])/g,'$1'); m=DEC.exec(s2); }
+  if(!m) return {ok:false,why:'format'};
+  var name=cleanName(m[1]), a=m[5].split('').map(Number);
+  if(!nkey(name)) return {ok:false,why:'format'};
+  if(chk(a)!==m[6].toUpperCase()) return {ok:false,why:'checksum',name:name};
+  var d=m[4]==='000000'?'':'20'+m[4].slice(0,2)+'-'+m[4].slice(2,4)+'-'+m[4].slice(4,6);
+  return {ok:true,name:name,key:nkey(name),role:m[2].toUpperCase(),round:m[3].toUpperCase(),date:d,answers:a};
+}
+function savedNames(round){ var h=hist(), seen={}, out=[], k; for(k in h){ var d=decode(h[k]); if(d.ok && (!round||d.round===round) && !seen[d.key]){ seen[d.key]=1; out.push(d.name); } } return out; }
+
+/* ================= Text helpers ================= */
+function esc(t){ return String(t).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+function eh(tag,em,inner){ return '<'+tag+' class="eh"><span aria-hidden="true">'+em+'</span><div>'+inner+'</div></'+tag+'>'; }
+function bi(id,en){ if(S.lang==='id') return '<span>'+id+'</span>'; if(S.lang==='en') return '<span>'+en+'</span>'; return '<span class="id">'+id+'</span><span class="en">'+en+'</span>'; }
+function one(id,en){ return S.lang==='en'?en:id; }
+var ROLE={S:['Mahasiswa','Student'],L:['Dosen','Lecturer'],O:['Lainnya','Other']};
+var ROUND={B:['Sebelum kegiatan','Before the programme'],A:['Sesudah kegiatan','After the programme']};
+var AREAS=D.areas, COMPS=D.comps, LEVELS=D.levels, ITEMS=D.items;
+function zoneColor(i){ return 'var(--z'+(i+1)+')'; }
+function today(){ var d=new Date(); var m=d.getMonth()+1, day=d.getDate(); return d.getFullYear()+'-'+(m<10?'0':'')+m+'-'+(day<10?'0':'')+day; }
+function LV(avg){ return LEVELS[lvlIdx(avg)]; }
+function nm(L){ return S.lang==='en'?L.en:(S.lang==='id'?L.id:L.id+' / '+L.en); }
+function pill(avg){ var L=LV(avg); return '<span class="pill">'+L.emoji+' '+esc(one(L.id,L.en))+'</span>'; }
+function ddmmyyyy(d){ return d? d.slice(8,10)+'/'+d.slice(5,7)+'/'+d.slice(0,4) : ''; }
+
+/* ================= Radar (levels 1 to 5) ================= */
+function radar(series){
+  var cx=180, cy=180, R=104, n=15, out='<svg class="radar" viewBox="0 0 360 360" role="img" aria-label="Radar">';
+  function pt(k,r){ var a=(-90+k*24)*Math.PI/180; return [cx+r*Math.cos(a), cy+r*Math.sin(a)]; }
+  [1,2,3,4,5].forEach(function(v){ var p=[],k; for(k=0;k<n;k++){ p.push(pt(k,R*v/5).map(function(x){return x.toFixed(1);}).join(',')); } out+='<polygon points="'+p.join(' ')+'" fill="none" stroke="var(--line)" stroke-width="'+(v===5?1.5:1)+'"/>'; });
+  var k; for(k=0;k<n;k++){ var e=pt(k,R); out+='<line x1="'+cx+'" y1="'+cy+'" x2="'+e[0].toFixed(1)+'" y2="'+e[1].toFixed(1)+'" stroke="var(--line)" stroke-width="1"/>'; }
+  series.forEach(function(s){ var p=s.vals.map(function(v,i){ return pt(i,R*v/5).map(function(x){return x.toFixed(1);}).join(','); });
+    out+='<polygon points="'+p.join(' ')+'" fill="'+(s.fill||'none')+'" fill-opacity="'+(s.fo||0)+'" stroke="'+s.stroke+'" stroke-width="'+(s.w||2.5)+'" '+(s.dash?'stroke-dasharray="6 4" ':'')+'stroke-linejoin="round"/>';
+    if(!s.dash){ s.vals.forEach(function(v,i){ var q=pt(i,R*v/5); out+='<circle cx="'+q[0].toFixed(1)+'" cy="'+q[1].toFixed(1)+'" r="3.5" fill="'+s.stroke+'"/>'; }); } });
+  for(k=0;k<n;k++){ var l=pt(k,R+22); out+='<text x="'+l[0].toFixed(1)+'" y="'+(l[1]-1).toFixed(1)+'" font-size="15" text-anchor="middle" dominant-baseline="middle" style="fill:initial">'+COMPS[k][1]+'</text><text x="'+l[0].toFixed(1)+'" y="'+(l[1]+13).toFixed(1)+'" font-size="9" text-anchor="middle" dominant-baseline="middle">'+COMPS[k][0]+'</text>'; }
+  [1,3,5].forEach(function(v){ var q=pt(0,R*v/5); out+='<text x="'+(q[0]+4).toFixed(1)+'" y="'+(q[1]+3).toFixed(1)+'" font-size="8">'+v+'</text>'; });
+  return out+'</svg>';
+}
+
+/* ================= Screens ================= */
+function header(){
+  var q = S.screen==='questions', n=answered(S.answers);
+  var h='<div class="top"><div class="wrap"><div class="brand">🧭 '+esc(one('Kompas Wirausaha Saya','My Entrepreneurial Compass'))+'</div>'
+   +'<div class="langs" role="group" aria-label="Language / Bahasa">'
+   +['id','en','both'].map(function(l){ return '<button data-a="lang" data-v="'+l+'" aria-pressed="'+(S.lang===l)+'">'+({id:'ID',en:'EN',both:'ID+EN'})[l]+'</button>'; }).join('')+'</div>';
+  if(q){ h+='<div class="prog"><span>'+esc(one('Terjawab','Answered'))+' '+n+'/'+NT+'</span><div class="bar"><i style="width:'+Math.round(n/NT*100)+'%"></i></div></div>'; }
+  return h+'</div></div>';
+}
+
+function citeHtml(){
+  return 'Research basis: Ahmad, A., Amry, D., Chen, Z., &amp; Hu, Y. (2025). Building entrepreneurial self-efficacy in engineering students: towards a new methodological framework. <i>Entrepreneurship Education, 9</i>, 21–56. <a href="https://doi.org/10.1007/s41959-025-00156-7" target="_blank" rel="noopener">doi:10.1007/s41959-025-00156-7</a>. ';
+}
+function ladder(avg){
+  var on=lvlIdx(avg);
+  return '<div class="ladder" aria-hidden="true">'+LEVELS.map(function(L,i){ return '<span class="'+(i===on?'on':'')+'">'+L.emoji+'</span>'; }).join('')+'</div>';
+}
+function welcome(){
+  var resume = answered(S.answers)>0 && answered(S.answers)<NT && S.name;
+  var sn = savedNames(), warnOn = S.warn && S.warn===nkey(S.name);
+  var h='<div class="hero"><h1>'+bi('Kompas Wirausaha Saya','My Entrepreneurial Compass')+'</h1>'
+   +'<p>'+bi('Temukan kekuatan super dan langkah berikutnya Anda sebagai calon wirausaha. Sekitar 10 menit. Bukan ujian: tidak ada jawaban benar atau salah.','Find your superpowers and your next steps as an entrepreneurial person. About 10 minutes. Not an exam: there are no right or wrong answers.')+'</p>'
+   +'<div class="how"><span>📝 '+esc(one('30 pernyataan','30 statements'))+'</span><span>🧭 '+esc(one('Peta pribadi','Your personal map'))+'</span><span>🌱 '+esc(one('Satu langkah kecil','One small next step'))+'</span></div></div>';
+  if(resume){ h+='<div class="card"><h3>'+bi('Lanjutkan jawaban tersimpan','Continue your saved answers')+'</h3><p class="muted">'+esc(S.name)+' · '+answered(S.answers)+'/'+NT+'</p><button class="btn" data-a="resume">'+bi('Lanjutkan','Continue')+'</button></div>'; }
+  h+='<div class="card"><h3>'+bi('Tentang Anda','About you')+'</h3>'
+   +'<div class="field"><label for="name">'+bi('Nama Anda','Your name')+'</label><input id="name" type="text" inputmode="text" autocomplete="off" autocapitalize="words" maxlength="24" value="'+esc(resume?'':S.name)+'" placeholder="Budi S">'
+   +'<div class="hint">'+bi('Tulis nama panggilan atau nama depan saja, tidak perlu nama lengkap. Yang penting: namanya sama persis saat mengisi Sebelum dan Sesudah kegiatan. Jika ada teman dengan nama depan yang sama, tambahkan inisial, mis. Budi S.','Write a nickname or first name only, not your full name. What matters: it is exactly the same in the Before and the After round. If a classmate has the same first name, add an initial, e.g. Budi S.')+'</div>'
+   +(sn.length?'<div class="hint">'+bi('Nama yang sudah dipakai di ponsel ini (klik untuk memilih):','Names already used on this phone (tap to pick):')+'</div><div class="chips">'+sn.map(function(n){ return '<button class="chip" data-a="usename" data-v="'+esc(n)+'">'+esc(n)+'</button>'; }).join('')+'</div>':'')
+   +'</div>'
+   +'<div class="field"><span class="lab">'+bi('Saya adalah','I am a')+'</span><div class="chips">'+['S','L','O'].map(function(r){ return '<button class="chip" data-a="role" data-v="'+r+'" aria-pressed="'+(S.role===r)+'">'+bi(ROLE[r][0],ROLE[r][1])+'</button>'; }).join('')+'</div></div>'
+   +'<div class="field"><span class="lab">'+bi('Pengisian','This is')+'</span><div class="chips">'+['B','A'].map(function(r){ return '<button class="chip" data-a="round" data-v="'+r+'" aria-pressed="'+(S.round===r)+'">'+bi(ROUND[r][0],ROUND[r][1])+'</button>'; }).join('')+'</div></div>'
+   +(warnOn?'<p class="err">'+bi('Nama ini belum ada di antara hasil Sebelum di ponsel ini ('+esc(savedNames('B').join(', '))+'). Jika Anda mengisi Sebelum di ponsel lain, tekan Mulai sekali lagi. Jika tidak, pilih nama yang benar di atas.','This name is not among the Before results on this phone ('+esc(savedNames('B').join(', '))+'). If you did the Before round on another phone, tap Start once more. Otherwise pick the right name above.')+'</p>':'')
+   +(S.err?'<p class="err">'+S.err+'</p>':'')
+   +'<p class="hint">'+bi('💾 Simpan tautan aplikasi ini (tambahkan ke penanda atau kirim ke diri sendiri). Anda akan membukanya lagi setelah kegiatan.','💾 Keep this app link (bookmark it or send it to yourself). You will open it again after the programme.')+'</p>'
+   +'<p class="hint">'+bi('Jawaban Anda tersimpan di ponsel Anda dan hanya dikirim ke fasilitator jika Anda sendiri menekan tombol kirim.','Your answers stay on your phone and are only sent to the facilitator if you choose to send them.')+'</p>'
+   +'<button class="btn" data-a="start">'+bi('Mulai','Start')+'</button></div>'
+   +'<div class="card"><button class="link" data-a="gotoOpen">'+bi('Punya pesan hasil? Buka atau bandingkan','Have a results message? Open it here')+'</button></div>'
+   +'<details class="card about"><summary><span aria-hidden="true">📚</span><div>'+bi('Dasar penelitian','Research basis')+'</div></summary>'
+   +'<p>'+bi('Alat ini dibangun di atas penelitian Ahmad, Amry, Chen &amp; Hu (2025) tentang membangun efikasi diri kewirausahaan (keyakinan pada kemampuan sendiri untuk berwirausaha) pada mahasiswa teknik.','This tool is built on the research of Ahmad, Amry, Chen &amp; Hu (2025) on building entrepreneurial self-efficacy (belief in your own ability to act entrepreneurially) in engineering students.')+'</p>'
+   +'<p>'+bi('Penelitian itu memakai 15 kompetensi EntreComp, mengukur keyakinan diri berulang kali selama pengalaman belajar langsung, dan memberi setiap mahasiswa laporan kompetensi pribadi untuk direfleksikan. Kompas ini mengikuti pola yang sama: 15 kompetensi, ukur Sebelum dan Sesudah, hasil pribadi langsung, lalu refleksi dan rencana.','The study used the 15 EntreComp competences, measured self-belief repeatedly across hands-on learning experiences, and gave each student a personal competency report to reflect on. This compass follows the same pattern: 15 competences, measured Before and After, an instant personal result, then reflection and a plan.')+'</p>'
+   +'<p>'+bi('Lima level: Menemukan, Menjelajah, Bereksperimen, dan Berani mengikuti empat level pertama EntreComp; Melampaui untuk Anda yang sudah melampaui Berani.','Five levels: Discover, Explore, Experiment and Dare follow the first four EntreComp levels; Beyond Dare is for you if you are already past Dare.')+'</p>'
+   +'<p class="muted">'+bi('Catatan: ini versi ringkas yang diadaptasi (30 pernyataan), bukan instrumen asli dalam penelitian (skala 1–8). Hasilnya mengukur keyakinan diri, bukan kemampuan yang terbukti.','Note: this is a shorter adapted version (30 statements), not the original instrument used in the study (1–8 scale). It measures self-belief, not proven ability.')+'</p>'
+   +'<p><a href="https://doi.org/10.1007/s41959-025-00156-7" target="_blank" rel="noopener">'+bi('Baca artikelnya','Read the article')+'</a></p></details>'
+   +'<p class="credit">'+citeHtml()+'Framework: EntreComp (Bacigalupo, Kampylis, Punie &amp; Van den Brande, 2016, Joint Research Centre, European Union; doi:10.2791/593884). Adapted by Dr Dwitya Amry with the help of Claude (Anthropic). Not an official EU tool; a self-reflection tool, not validated as a test.</p>'
+   +'<button class="link" data-a="gotoFac" style="font-size:.8rem;color:var(--muted)">Facilitator</button>';
+  return h;
+}
+
+function banner(k){
+  var b=null;
+  if(k===5) b=['🎉','Zona 1 selesai! Berikutnya: Sumber Daya.','Zone 1 done! Next: Resources.'];
+  else if(k===7) b=['🌟','Sudah separuh jalan. Terus semangat!','Halfway there. Keep going!'];
+  else if(k===10) b=['🎉','Zona 2 selesai! Tinggal satu zona lagi: Beraksi.','Zone 2 done! One zone to go: Into Action.'];
+  else if(k===14) b=['🏁','Layar terakhir! Peta Anda hampir siap.','Last screen! Your map is almost ready.'];
+  return b? '<div class="banner"><span aria-hidden="true">'+b[0]+'</span><div>'+bi(b[1],b[2])+'</div></div>' : '';
+}
+function questions(){
+  var k=S.step, c=COMPS[k], zi=parseInt(c[0].charAt(0),10)-1, a=AREAS[zi];
+  var base=NI*k, done=S.answers[base]&&S.answers[base+1];
+  var h=banner(k)+'<div class="card" style="--zc:'+zoneColor(zi)+'"><div class="zone"><i></i>'+esc(one('Zona','Zone'))+' '+a.id+' · '+esc(one(a.id_name,a.en_name))+' · '+(k+1)+'/15</div>'
+   +eh('h2',c[1],bi(c[2],c[3]))
+   +(k===0?'<p class="hint">'+bi('Tidak ada jawaban benar atau salah. Klik level yang paling menggambarkan Anda hari ini.','There are no right or wrong answers. Tap the level that best describes you today.')+'</p>':'')
+   +'<div class="legend" aria-hidden="true"><span>🌱 '+esc(one('Baru mulai','Just starting'))+'</span><span>'+esc(one('Sudah memimpin','Already leading'))+' 🚀</span></div>';
+  ITEMS[k].forEach(function(it,j){ var i=base+j, v=S.answers[i], L=v?LEVELS[v-1]:null;
+    h+='<div class="item"><p class="stmt" id="s'+i+'">'+bi(it.si,it.se)+'</p><div class="scale" role="radiogroup" aria-labelledby="s'+i+'">'
+     +LEVELS.map(function(l,n){ return '<button role="radio" aria-checked="'+(v===n+1)+'" aria-label="'+esc(l.id+' / '+l.en)+'" data-a="ans" data-i="'+i+'" data-v="'+(n+1)+'"><span class="em">'+l.emoji+'</span><span class="n">'+(n+1)+'</span></button>'; }).join('')+'</div>'
+     +'<div class="picked" aria-live="polite">'+(L?'<b>'+L.emoji+' '+esc(nm(L))+'</b><span class="muted">'+esc(one(L.tag_id,L.tag_en))+'</span>'+bi(esc(it.li[v-1]),esc(it.le[v-1])):'<span class="muted">'+esc(one('Klik level yang paling cocok.','Tap the level that fits you.'))+'</span>')+'</div>'
+     +'<details class="all" data-d="'+i+'"'+(OPEN[i]?' open':'')+'><summary>'+esc(one('Lihat semua level','See all levels'))+'</summary><ol>'
+     +LEVELS.map(function(l,n){ return '<li><b>'+l.emoji+' '+esc(nm(l))+'</b>'+bi(esc(it.li[n]),esc(it.le[n]))+'</li>'; }).join('')+'</ol></details></div>'; });
+  h+='</div>';
+  var last=k===14;
+  h+='<div class="bottom" id="bottombar"><div class="wrap"><button class="btn alt" data-a="back">'+bi('Kembali','Back')+'</button>'
+   +'<button class="btn" data-a="next" aria-disabled="'+(!done)+'">'+(last?bi('Lihat peta saya','See my map'):bi('Lanjut','Next'))+'</button></div></div>';
+  return h;
+}
+
+function compareBlock(cur){
+  var b=S.cmp; var h='';
+  if(S.round!=='A') return '';
+  if(!b){ var ph=hist()[nkey(S.name)+'|B']; if(ph){ var d=decode(ph); if(d.ok) b=d; } }
+  if(!b){
+    return '<div class="card"><h3>'+bi('Bandingkan dengan hasil Sebelum','Compare with your Before result')+'</h3><p class="muted">'+bi('Tempel pesan hasil Sebelum Anda (yang berisi EC3|…) untuk melihat perubahannya.','Paste your Before results message (the one containing EC3|…) to see what changed.')+'</p>'
+     +'<textarea id="cmptext" placeholder="EC3|…" rows="2">'+esc(S.cmpText)+'</textarea>'+(S.cmpMsg?'<p class="err">'+S.cmpMsg+'</p>':'')
+     +'<button class="btn small" data-a="cmp">'+bi('Bandingkan','Compare')+'</button></div>';
+  }
+  var s0=scores(b.answers), s1=cur, diff=s1.t-s0.t, up=0; s1.c.forEach(function(v,i){ if(v>s0.c[i]) up++; });
+  var msg = diff>0.04 ? bi('Anda tumbuh! Lihat kompetensi mana yang naik.','You grew! See which competences went up.')
+          : diff<-0.04 ? bi('Skor sedikit turun? Bisa jadi sekarang Anda lebih paham seperti apa tiap level sebenarnya. Itu juga kemajuan.','Score a little lower? It may mean you now understand better what each level really looks like. That is progress too.')
+          : bi('Hasil Anda stabil. Cobalah satu langkah kecil untuk menaikkan satu kompetensi.','Your result is steady. Try one small step to lift a single competence.');
+  h+='<div class="card"><h3>'+bi('Sebelum dan sesudah','Before and after')+'</h3>'
+   +'<div class="total"><b>'+(diff>0.04?'+':'')+f1(diff)+'</b><span class="muted">'+f1(s0.t)+' → '+f1(s1.t)+' / 5</span></div>'
+   +'<p>'+msg+'</p><p class="muted">'+esc(one('Naik di '+up+' dari 15 kompetensi','Up in '+up+' of 15 competences'))+'</p>'
+   +(b.key!==nkey(S.name)?'<p class="muted">'+esc(one('Catatan: hasil Sebelum ini atas nama "'+b.name+'".','Note: this Before result was entered under the name "'+b.name+'".'))+'</p>':'')
+   +radar([{vals:s0.c,stroke:'var(--muted)',dash:true,w:2},{vals:s1.c,stroke:'var(--accent)',fill:'var(--accent)',fo:.14}])
+   +'<div class="key"><span><i class="b"></i>'+esc(one('Sebelum','Before'))+'</span><span><i></i>'+esc(one('Sesudah','After'))+'</span></div>'
+   +'<div class="scroll"><table class="cmp"><thead><tr><th>'+esc(one('Kompetensi','Competence'))+'</th><th>'+esc(one('Sblm','Before'))+'</th><th>'+esc(one('Ssdh','After'))+'</th><th>Δ</th></tr></thead><tbody>'
+   +COMPS.map(function(c,i){ var d=s1.c[i]-s0.c[i]; return '<tr><td>'+c[1]+' '+esc(one(c[2],c[3]))+'</td><td>'+f1(s0.c[i])+'</td><td>'+f1(s1.c[i])+'</td><td><b style="color:'+(d>0?'var(--good)':d<0?'var(--warn)':'var(--muted)')+'">'+(d>0?'+':'')+f1(d)+'</b></td></tr>'; }).join('')
+   +'</tbody></table></div></div>';
+  return h;
+}
+
+/* The message the student sends on WhatsApp: readable lines on top, the machine line (EC3|…) at the bottom. */
+function waMessage(){
+  var sc=scores(S.answers), L=LV(sc.t);
+  return '🧭 Kompas Wirausaha Saya (EntreComp)\n'
+   +'Nama / Name: '+cleanName(S.name)+'\n'
+   +'Peran / Role: '+ROLE[S.role][0]+' / '+ROLE[S.role][1]+'\n'
+   +'Tahap / Round: '+ROUND[S.round][0]+' / '+ROUND[S.round][1]+'\n'
+   +'Tanggal / Date: '+ddmmyyyy(S.date)+'\n'
+   +'Skor / Score: '+f1(sc.t)+'/5 · '+L.emoji+' '+L.id+' / '+L.en+'\n'
+   +AREAS.map(function(a,i){ return a.emoji+' '+f1(sc.z[i]); }).join(' · ')+'\n'
+   +'Kode / Code:\n'+encode(S);
+}
+
+function results(){
+  var sc=scores(S.answers), L=LV(sc.t), tg=tagsFor(sc), rk=ranks(sc.c), msg=waMessage();
+  var ups=[], dns=[]; COMPS.forEach(function(c,i){ if(tg[i]==='up') ups.push(i); if(tg[i]==='dn') dns.push(i); });
+  ups.sort(function(a,b){return rk[a]-rk[b];}); dns.sort(function(a,b){return rk[b]-rk[a];});
+  var h='<div class="hero"><div class="muted" style="color:inherit;opacity:.8">'+esc(S.name)+' · '+esc(one(ROLE[S.role][0],ROLE[S.role][1]))+' · '+esc(one(ROUND[S.round][0],ROUND[S.round][1]))+'</div>'
+   +'<div class="total"><b>'+f1(sc.t)+'</b><span>/ 5</span></div>'
+   +eh('h2',L.emoji,bi(L.id,L.en))+'<p>'+bi(L.id_desc,L.en_desc)+'</p>'+ladder(sc.t)
+   +'<p class="small">'+esc(one('Level bukan nilai. Ini titik awal perjalanan Anda.','A level is not a grade. It is the starting point of your journey.'))+'</p></div>';
+  h+='<div class="keep"><b>💾 '+bi('Simpan hasil Anda sekarang!','Save your results now!')+'</b>'
+   +'<p>'+bi('Hasil hanya tersimpan di ponsel ini dan bisa hilang jika Anda menghapus data peramban atau berganti ponsel. Salin pesan hasil lalu tempel di WhatsApp atau catatan Anda sendiri, dan simpan tautan aplikasi ini. Anda membutuhkannya untuk membuka hasil dan membandingkan setelah kegiatan.','Your results are stored on this phone only and can disappear if you clear browser data or change phones. Copy the results message and paste it into your own WhatsApp or notes, and keep this app link. You will need both to reopen your results and compare after the programme.')+'</p>'
+   +'<button class="btn small" data-a="copy" data-t="msgbox">'+bi('Salin pesan hasil','Copy results message')+'</button></div>';
+  h+='<div class="card">'+eh('h3','💪',bi('Kekuatan super Anda','Your superpowers'))
+   +(ups.length?'<p class="muted">'+bi('Ini sudah menjadi kekuatan Anda. Rayakan, dan pakai untuk membantu orang lain.','These are already your strengths. Celebrate them, and use them to help others.')+'</p><div class="rows">'+ups.map(function(i){ var c=COMPS[i]; return '<div class="row" style="--zc:'+zoneColor(parseInt(c[0].charAt(0),10)-1)+'"><span class="nm">'+c[1]+' '+esc(one(c[2],c[3]))+'</span><span class="sc">'+pill(sc.c[i])+'</span></div>'; }).join('')+'</div>'
+        :'<p>'+bi('Profil Anda merata: tidak ada yang menonjol atau tertinggal. Itu tanda keseimbangan yang baik.','Your profile is even: nothing stands out or lags behind. That is a good sign of balance.')+'</p>')+'</div>';
+  h+='<div class="card"><h3>'+bi('Kompas saya','My compass')+'</h3>'+radar([{vals:sc.c,stroke:'var(--accent)',fill:'var(--accent)',fo:.16}])
+   +'<p class="muted" style="text-align:center">'+esc(one('Level 1–5 per kompetensi','Level 1–5 per competence'))+'</p></div>';
+  h+='<div class="card"><h3>'+bi('Tiga zona','Three zones')+'</h3><div class="rows">'+AREAS.map(function(a,i){ var z=sc.z[i]; return '<div class="row" style="--zc:'+zoneColor(i)+'"><span class="nm">'+a.emoji+' '+esc(one(a.id_name,a.en_name))+'</span><span class="sc">'+f1(z)+'</span><span class="meter"><i style="width:'+Math.round(z/5*100)+'%"></i></span></div>'; }).join('')+'</div></div>';
+  h+='<div class="card"><h3>'+bi('15 kompetensi','15 competences')+'</h3><div class="rows">'+COMPS.map(function(c,i){ var zi=parseInt(c[0].charAt(0),10)-1;
+     var tag = tg[i]==='up'?'<span class="tag up">🦸 '+esc(one('Kekuatan super','Superpower'))+'</span>':(tg[i]==='dn'?'<span class="tag dn">🌿 '+esc(one('Langkah berikutnya','Next step'))+'</span>':'');
+     return '<div class="row" style="--zc:'+zoneColor(zi)+'"><span class="nm">'+c[1]+' '+esc(one(c[2],c[3]))+tag+'</span><span class="sc">'+LV(sc.c[i]).emoji+' '+f1(sc.c[i])+'</span><span class="meter"><i style="width:'+Math.round(sc.c[i]/5*100)+'%"></i></span></div>'; }).join('')+'</div></div>';
+  h+='<div class="card">'+eh('h3','🌱',bi('Langkah kecil berikutnya','Your next small steps'))
+   +(dns.length? dns.map(function(i){ var c=COMPS[i]; return '<div class="act"><b>'+c[1]+' '+esc(one(c[2],c[3]))+'</b><span>'+bi(c[4],c[5])+'</span></div>'; }).join('')
+               : '<p>'+bi('Pilih satu kompetensi yang paling ingin Anda coba kembangkan, lalu lakukan satu hal kecil minggu ini.','Pick one competence you most want to grow and do one small thing this week.')+'</p>')
+   +'<p class="hint">'+bi('Dalam penelitian di balik alat ini, keyakinan diri tumbuh lewat pengalaman nyata (mastery experience). Coba satu aksi kecil, lalu ulangi.','In the research behind this tool, self-belief grows through real experience (mastery experience). Try one small action, then repeat.')+'</p></div>';
+  h+=compareBlock(sc);
+  h+='<div class="card">'+eh('h3','🗺️',bi('Rencana saya','My plan'))
+   +[['Minggu ini','This week'],['Bulan ini','This month'],['Semester ini','This semester']].map(function(p,i){ return '<div class="field"><label for="plan'+i+'">'+bi(p[0],p[1])+'</label><textarea id="plan'+i+'" data-plan="'+i+'" rows="2">'+esc(S.plan[i])+'</textarea></div>'; }).join('')
+   +eh('h3','💭',bi('Refleksi','Reflection'))
+   +D.reflect.map(function(r,i){ return '<div class="field"><label for="ref'+i+'">'+bi(r[0],r[1])+'</label><textarea id="ref'+i+'" data-ref="'+i+'" rows="2">'+esc(S.reflect[i])+'</textarea></div>'; }).join('')
+   +'<p class="hint">'+bi('Catatan ini hanya tersimpan di ponsel Anda.','These notes stay on your phone only.')+'</p></div>';
+  var wa='https://wa.me/'+String(CONFIG.WA_NUMBER||'').replace(/\D/g,'')+'?text='+encodeURIComponent(msg);
+  var link = (CONFIG.FORM_URL && CONFIG.FORM_ENTRY) ? CONFIG.FORM_URL+(CONFIG.FORM_URL.indexOf('?')<0?'?':'&')+'usp=pp_url&'+encodeURIComponent(CONFIG.FORM_ENTRY)+'='+encodeURIComponent(msg) : '';
+  h+='<div class="card">'+eh('h3','📤',bi('Kirim hasil saya ke fasilitator','Send my results to my facilitator'))
+   +'<p class="muted">'+bi('Tekan tombol hijau: WhatsApp terbuka dengan pesan yang sudah terisi, tinggal tekan Kirim. Kirim langsung ke fasilitator, bukan ke grup kelas.','Tap the green button: WhatsApp opens with the message already written, just press Send. Send it directly to your facilitator, not to the class group.')+'</p>'
+   +'<div class="msgbox" id="msgbox">'+esc(msg)+'</div>'
+   +'<a class="btn wa" href="'+esc(wa)+'" target="_blank" rel="noopener">'+bi('Kirim lewat WhatsApp','Send via WhatsApp')+'</a>'
+   +'<button class="btn alt" data-a="copy" data-t="msgbox">'+bi('Salin pesan','Copy message')+'</button>'
+   +(link?'<a class="btn alt" href="'+esc(link)+'" target="_blank" rel="noopener">'+bi('Kirim lewat formulir','Send via form')+'</a>':'')
+   +(S.round==='B'?'<p class="ok">'+bi('Ingat nama Anda: '+esc(S.name)+'. Setelah kegiatan, isi lagi dengan nama yang sama persis.','Remember your name: '+esc(S.name)+'. After the programme, enter exactly the same name.')+'</p>':'')
+   +'<p class="hint">'+bi('Pesan berisi nama dan jawaban Anda. Simpan pesan ini di tempat aman: tanpa pesan ini, hasil tidak bisa dibuka lagi jika data ponsel terhapus.','The message holds your name and answers. Keep it somewhere safe: without it your results cannot be reopened if the phone data is cleared.')+'</p></div>';
+  h+='<div class="card"><button class="btn alt" data-a="edit">'+bi('Ubah jawaban saya','Change my answers')+'</button>'
+   +(S.confirm?'<p class="err">'+bi('Hapus semua jawaban di ponsel ini dan mulai lagi?','Delete all answers on this phone and start again?')+'</p><div style="display:flex;gap:8px"><button class="btn small" data-a="reset" style="flex:1">'+bi('Ya, hapus','Yes, delete')+'</button><button class="btn alt small" data-a="noreset" style="flex:1">'+bi('Batal','Cancel')+'</button></div>'
+     :'<button class="link" data-a="askreset">'+bi('Mulai dari awal','Start over')+'</button>')+'</div>';
+  h+='<p class="credit">'+citeHtml()+'Framework: EntreComp (Bacigalupo et al., 2016, Joint Research Centre, European Union). Adapted by Dr Dwitya Amry with the help of Claude (Anthropic). Levels 1–4 follow the first four EntreComp levels; level 5 (Beyond Dare) groups the higher ones. A self-reflection tool that measures self-belief (perceived competence), not a validated test or proof of ability.</p>';
+  return h;
+}
+
+function openScreen(){
+  return '<div class="card"><h2>'+bi('Buka pesan hasil','Open a results message')+'</h2><p class="muted">'+bi('Tempel pesan hasil Anda dari WhatsApp (yang berisi baris EC3|…) untuk melihat hasil di ponsel ini.','Paste your results message from WhatsApp (the one with the EC3|… line) to see your results on this phone.')+'</p>'
+   +'<textarea id="opentext" rows="4" placeholder="EC3|…">'+esc(S.openText)+'</textarea>'+(S.openErr?'<p class="err">'+S.openErr+'</p>':'')
+   +'<button class="btn" data-a="doOpen">'+bi('Buka','Open')+'</button><button class="btn alt" data-a="gotoWelcome">'+bi('Kembali','Back')+'</button></div>';
+}
+
+/* ----- Facilitator ----- */
+var FAC={text:'',alias:'',res:null,roleLabels:'id'};
+function lev(a,b){ var m=a.length,n=b.length,d=[],i,j; for(i=0;i<=m;i++){ d[i]=[i]; } for(j=1;j<=n;j++){ d[0][j]=j; }
+  for(i=1;i<=m;i++){ for(j=1;j<=n;j++){ d[i][j]=Math.min(d[i-1][j]+1,d[i][j-1]+1,d[i-1][j-1]+(a.charAt(i-1)===b.charAt(j-1)?0:1)); } } return d[m][n]; }
+function similar(a,b){ if(Math.min(a.length,b.length)>=3 && (a.indexOf(b)===0||b.indexOf(a)===0)) return true; return a.length>=4 && b.length>=4 && lev(a,b)<=1; }
+function aliasMap(text){ var m={}; String(text||'').split(/\r?\n/).forEach(function(ln){ var p=ln.split('='); if(p.length===2){ var l=nkey(p[0]), r=nkey(p[1]); if(l&&r&&l!==r) m[l]=r; } }); return m; }
+function parseCodes(text,aliasText){
+  var amap=aliasMap(aliasText), idx=[], re=/EC3\s*\|/gi, m, good={}, bad=[], dup=[], B=[], A=[], k, canon={};
+  while((m=re.exec(text))){ idx.push(m.index); }
+  idx.forEach(function(p,n){ var seg=text.slice(p, n+1<idx.length?idx[n+1]:text.length).slice(0,320), d=decode(seg);
+    if(!d.ok){ bad.push('Entry '+(n+1)+(d.name?' ('+d.name+')':'')+': '+(d.why==='checksum'?'checksum mismatch (typo in the code?)':'not readable')); return; }
+    d.key=amap[d.key]||d.key; var gk=d.key+'|'+d.round;
+    if(good[gk] && good[gk].answers.join('')!==d.answers.join('')) dup.push(d.name+' ('+ROUND[d.round][1]+')');
+    good[gk]=d; });
+  for(k in good){ (good[k].round==='B'?B:A).push(good[k]); }
+  B.forEach(function(x){ canon[x.key]=x.name; }); A.forEach(function(x){ if(!canon[x.key]) canon[x.key]=x.name; });
+  B.concat(A).forEach(function(x){ x.cname=canon[x.key]; });
+  return {B:B,A:A,bad:bad,dup:dup,n:idx.length};
+}
+function fac(){
+  var h='<div class="card fac"><h2>Facilitator</h2><p class="muted">Paste the WhatsApp messages from students (select several messages in WhatsApp and copy them, or paste them one after another). The app reads every line that starts with EC3|. Nothing leaves this page.</p>'
+   +'<textarea id="factext" rows="6" placeholder="EC3|Budi S|S|B|261116|…">'+esc(FAC.text)+'</textarea>'
+   +'<div class="field"><label for="facalias">Same person, different spelling (optional)</label><textarea id="facalias" rows="2" placeholder="Budi = Budi S">'+esc(FAC.alias)+'</textarea><div class="hint">One pair per line. Names are matched ignoring capitals, spaces, punctuation and accents.</div></div>'
+   +'<div class="field"><span class="lab">Role labels in the output</span><div class="chips"><button class="chip" data-a="facrole" data-v="id" aria-pressed="'+(FAC.roleLabels==='id')+'">Mahasiswa / Dosen / Lainnya</button><button class="chip" data-a="facrole" data-v="en" aria-pressed="'+(FAC.roleLabels==='en')+'">Student / Lecturer / Other</button></div></div>'
+   +'<button class="btn" data-a="facrun">Analyse</button><button class="btn alt" data-a="gotoWelcome">Back to the app</button></div>';
+  if(FAC.res){ var r=FAC.res, P=[], Ak={}, Bk={};
+    r.A.forEach(function(x){ Ak[x.key]=x; }); r.B.forEach(function(x){ Bk[x.key]=x; });
+    r.B.forEach(function(b){ if(Ak[b.key]) P.push([b,Ak[b.key]]); });
+    var ub=r.B.filter(function(x){return !Ak[x.key];}), ua=r.A.filter(function(x){return !Bk[x.key];}), hints=[];
+    ub.forEach(function(b){ ua.forEach(function(a){ if(similar(b.key,a.key)) hints.push(b.name+' = '+a.name); }); });
+    h+='<div class="card fac"><h3>Summary</h3><p>Before: <b>'+r.B.length+'</b> · After: <b>'+r.A.length+'</b> · Paired: <b>'+P.length+'</b>'+(r.bad.length?' · <span class="err">'+r.bad.length+' not read</span>':'')+'</p>'
+     +(r.bad.length?'<pre class="out">'+esc(r.bad.join('\n'))+'</pre>':'')
+     +(r.dup.length?'<p class="err">Same name, different answers in the same round (latest kept): '+esc(r.dup.join(', '))+'. Ask them to add an initial to their name.</p>':'');
+    [['Before',r.B],['After',r.A]].forEach(function(g){ if(g[1].length){ var tots=g[1].map(function(x){return scores(x.answers).t;}); h+='<p>'+g[0]+' mean level: <b>'+f2(mean(tots))+'</b> / 5 · '+['S','L','O'].map(function(k){ var n=g[1].filter(function(x){return x.role===k;}).length; return ROLE[k][1]+' '+n; }).join(', ')+'</p>'; } });
+    if(P.length){ var ch=P.map(function(p){return scores(p[1].answers).t-scores(p[0].answers).t;});
+      h+='<h3>Paired change (n='+P.length+')</h3><p>Mean change in overall level: <b>'+(mean(ch)>0?'+':'')+f2(mean(ch))+'</b> · improved: '+ch.filter(function(x){return x>0.001;}).length+', same: '+ch.filter(function(x){return Math.abs(x)<=0.001;}).length+', lower: '+ch.filter(function(x){return x<-0.001;}).length+'</p>'
+       +'<div class="scroll"><table class="cmp"><thead><tr><th>Competence</th><th>Before</th><th>After</th><th>Δ</th></tr></thead><tbody>'
+       +COMPS.map(function(c,i){ var b=mean(P.map(function(p){return scores(p[0].answers).c[i];})), a=mean(P.map(function(p){return scores(p[1].answers).c[i];})), d=a-b; return '<tr><td>'+c[1]+' '+c[0]+' '+esc(c[3])+'</td><td>'+f2(b)+'</td><td>'+f2(a)+'</td><td><b style="color:'+(d>0?'var(--good)':d<0?'var(--warn)':'var(--muted)')+'">'+(d>0?'+':'')+f2(d)+'</b></td></tr>'; }).join('')
+       +'</tbody></table></div><p class="hint">Means of levels 1–5 per competence.</p>'; }
+    h+='</div>';
+    if(ub.length||ua.length){
+      h+='<div class="card fac"><h3>Not paired yet</h3>'
+       +(ub.length?'<p><b>Before only (' + ub.length + '):</b> '+esc(ub.map(function(x){return x.name;}).join(', '))+'</p>':'')
+       +(ua.length?'<p><b>After only (' + ua.length + '):</b> '+esc(ua.map(function(x){return x.name;}).join(', '))+'</p>':'')
+       +(hints.length?'<p class="hint">These look like the same person. Copy the lines into “Same person, different spelling” above and press Analyse:</p><pre class="out">'+esc(hints.join('\n'))+'</pre>':'<p class="hint">If two of these are the same person written differently, add a line such as Budi = Budi S in the box above and press Analyse.</p>')
+       +'</div>'; }
+    function role(x){ return FAC.roleLabels==='id'?ROLE[x.role][0]:ROLE[x.role][1]; }
+    function tsv(list){ return list.map(function(x){ return [x.cname,role(x),ddmmyyyy(x.date),''].concat(x.answers).join('\t'); }).join('\n'); }
+    function tsvScores(){ var head=['Name','Role','Round','Date','Overall'].concat(COMPS.map(function(c){return c[0]+' '+c[3];})).join('\t');
+      return head+'\n'+r.B.concat(r.A).map(function(x){ var s=scores(x.answers); return [x.cname,role(x),x.round==='B'?'Before':'After',ddmmyyyy(x.date),f2(s.t)].concat(s.c.map(f2)).join('\t'); }).join('\n'); }
+    if(r.B.length||r.A.length){
+      h+='<div class="card fac"><h3>Per-person scores (all rounds)</h3><p class="hint">Name, role, round, date, overall level, then the mean level (1–5) of each competence. Copy and paste into Excel or SPSS.</p><textarea id="tsvS" rows="5" readonly style="font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.72rem;white-space:pre">'+esc(tsvScores())+'</textarea><button class="btn small" data-a="copy" data-t="tsvS">Copy scores</button></div>'; }
+    [['Before','B'],['After','A']].forEach(function(g){ var list=r[g[1]]; if(!list.length) return; var id='tsv'+g[1];
+      h+='<div class="card fac"><h3>'+g[0]+': raw answers</h3><p class="hint">Columns: Name, Role, Date, (blank), then the level (1–5) of statements S1–S30.</p><textarea id="'+id+'" rows="4" readonly style="font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.72rem;white-space:pre">'+esc(tsv(list))+'</textarea><button class="btn small" data-a="copy" data-t="'+id+'">Copy '+g[0]+' rows</button></div>'; });
+  }
+  return h;
+}
+
+/* ================= Render ================= */
+function render(){
+  var root=document.getElementById('root'), body;
+  if(S.screen==='welcome') body=welcome(); else if(S.screen==='questions') body=questions(); else if(S.screen==='results') body=results(); else if(S.screen==='open') body=openScreen(); else body=fac();
+  var split = body.indexOf('<div class="bottom"');
+  var main = split>=0 ? body.slice(0,split) : body, bottom = split>=0 ? body.slice(split) : '';
+  root.innerHTML = header()+'<main class="wrap lang-'+S.lang+'">'+main+'</main>'+bottom;
+  document.documentElement.lang = S.lang==='en'?'en':'id';
+}
+function go(screen){ S.screen=screen; save(); render(); window.scrollTo(0,0); }
+
+/* ================= Actions ================= */
+function flash(btn,txt){ var o=btn.innerHTML; btn.textContent=txt; setTimeout(function(){ btn.innerHTML=o; },1600); }
+function copyFrom(btn){
+  var el=document.getElementById(btn.getAttribute('data-t')); if(!el) return;
+  var text = el.value!==undefined ? el.value : el.textContent;
+  function fallback(){ try{ if(el.select){ el.focus(); el.select(); } else { var r=document.createRange(); r.selectNodeContents(el); var s=window.getSelection(); s.removeAllRanges(); s.addRange(r); } flash(btn,one('Pilih & salin secara manual','Selected: press copy')); }catch(e){} }
+  try{ navigator.clipboard.writeText(text).then(function(){ flash(btn,one('Tersalin ✔','Copied ✔')); },fallback); }catch(e){ fallback(); }
+}
+function finish(){ S.date=S.date||today(); histSet(nkey(S.name)+'|'+S.round, encode(S)); S.cmp=null; S.cmpMsg=''; S.cmpText=''; go('results'); }
+function codeErr(d){ return d.why==='checksum'?one('Kode tidak valid (ada salah ketik?).','That code does not check out (a typo?).'):one('Pesan tidak dikenali. Tempel seluruh pesan, atau baris yang diawali EC3|.','Not recognised. Paste the whole message, or the line that starts with EC3|.'); }
+
+document.addEventListener('click',function(e){
+  var t=e.target.closest('[data-a]'); if(!t) return; var a=t.getAttribute('data-a'), v=t.getAttribute('data-v');
+  if(a==='lang'){ S.lang=v; save(); render(); }
+  else if(a==='role'){ S.role=v; S.err=''; save(); render(); }
+  else if(a==='round'){ S.round=v; S.err=''; save(); render(); }
+  else if(a==='usename'){ S.name=cleanName(v); S.warn=''; S.err=''; save(); render(); }
+  else if(a==='start'){
+    var el=document.getElementById('name'); S.name=cleanName(el?el.value:S.name);
+    if(!nkey(S.name)||!S.role||!S.round){ S.err=one('Isi nama Anda, pilih peran dan jenis pengisian.','Enter your name and pick your role and round.'); save(); render(); return; }
+    if(S.round==='A'){ var bn=savedNames('B'); if(bn.length && !bn.some(function(n){ return nkey(n)===nkey(S.name); }) && S.warn!==nkey(S.name)){ S.warn=nkey(S.name); S.err=''; save(); render(); return; } }
+    S.err=''; S.warn=''; S.answers=Array(NT).fill(0); S.step=0; S.plan=['','','']; S.reflect=['','','']; S.cmp=null; S.date=today(); OPEN={}; go('questions'); }
+  else if(a==='resume'){ var f=S.answers.findIndex(function(x){return !x;}); S.step=f<0?0:Math.min(14,Math.floor(f/NI)); go('questions'); }
+  else if(a==='ans'){ var i=+t.getAttribute('data-i'); S.answers[i]=+v; save(); var y=window.scrollY; render(); window.scrollTo(0,y); }
+  else if(a==='next'){ var b=NI*S.step; if(!(S.answers[b]&&S.answers[b+1])) return; if(S.step<14){ S.step++; save(); render(); window.scrollTo(0,0); } else finish(); }
+  else if(a==='back'){ if(S.step>0){ S.step--; save(); render(); window.scrollTo(0,0); } else go('welcome'); }
+  else if(a==='copy'){ copyFrom(t); }
+  else if(a==='edit'){ S.step=0; go('questions'); }
+  else if(a==='askreset'){ S.confirm=true; render(); }
+  else if(a==='noreset'){ S.confirm=false; render(); }
+  else if(a==='reset'){ var lang=S.lang; S=blank(); S.lang=lang; store.del(HKEY); go('welcome'); }
+  else if(a==='gotoOpen'){ S.openErr=''; go('open'); }
+  else if(a==='gotoWelcome'){ if(location.hash==='#facilitator') location.hash=''; go('welcome'); }
+  else if(a==='gotoFac'){ location.hash='facilitator'; }
+  else if(a==='doOpen'){ var d=decode(document.getElementById('opentext').value); S.openText=document.getElementById('opentext').value;
+    if(!d.ok){ S.openErr=codeErr(d); render(); return; }
+    S.name=d.name; S.role=d.role; S.round=d.round; S.date=d.date; S.answers=d.answers; S.cmp=null; S.openErr=''; S.openText=''; histSet(d.key+'|'+d.round, encode(S)); go('results'); }
+  else if(a==='cmp'){ var tx=document.getElementById('cmptext').value; S.cmpText=tx; var d2=decode(tx);
+    if(!d2.ok){ S.cmpMsg=codeErr(d2); }
+    else if(d2.round!=='B'){ S.cmpMsg=one('Ini hasil Sesudah. Tempel hasil Sebelum.','That is an After result. Paste your Before result.'); }
+    else { S.cmp=d2; S.cmpMsg=''; }
+    render(); }
+  else if(a==='facrole'){ FAC.text=document.getElementById('factext').value; FAC.alias=document.getElementById('facalias').value; FAC.roleLabels=v; if(FAC.res) FAC.res=parseCodes(FAC.text,FAC.alias); render(); }
+  else if(a==='facrun'){ FAC.text=document.getElementById('factext').value; FAC.alias=document.getElementById('facalias').value; FAC.res=parseCodes(FAC.text,FAC.alias); render(); }
+});
+document.addEventListener('input',function(e){
+  var t=e.target;
+  if(t.id==='name'){ S.name=t.value; save(); }
+  else if(t.hasAttribute('data-plan')){ S.plan[+t.getAttribute('data-plan')]=t.value; save(); }
+  else if(t.hasAttribute('data-ref')){ S.reflect[+t.getAttribute('data-ref')]=t.value; save(); }
+});
+document.addEventListener('toggle',function(e){ var t=e.target; if(t && t.getAttribute && t.getAttribute('data-d')!==null){ OPEN[t.getAttribute('data-d')]=t.open; } },true);
+function route(){ if(location.hash==='#facilitator'){ S.screen='fac'; render(); } else if(S.screen==='fac'){ S.screen='welcome'; render(); } }
+window.addEventListener('hashchange',route);
+if(S.screen==='questions' && !S.name){ S.screen='welcome'; }
+if(S.screen==='results' && answered(S.answers)<NT){ S.screen='welcome'; }
+if(location.hash==='#facilitator') S.screen='fac';
+render();
+})();
+</script>
