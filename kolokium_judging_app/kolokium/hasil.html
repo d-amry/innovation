@@ -10,11 +10,12 @@ main{padding:16px 22px}
 .tools{background:#fff;border:1px solid #ddd;border-radius:10px;padding:12px;margin-bottom:14px}
 textarea{width:100%;height:90px;border:2px solid #bbb;border-radius:8px;padding:8px;font-size:13px;font-family:monospace}
 button{padding:10px 16px;border:0;border-radius:8px;font-size:14px;font-weight:bold;color:#fff;background:var(--red);margin:6px 6px 0 0;cursor:pointer}button.alt{background:var(--dark)}
+select{padding:8px;border:2px solid #bbb;border-radius:8px;font-size:14px;max-width:240px}
 #info{font-size:13px;color:var(--grey);margin-top:8px}
 table{width:100%;border-collapse:collapse;background:#fff;border-radius:10px;overflow:hidden}
 th{background:var(--red);color:#fff;text-align:left;padding:10px;font-size:14px}th small{display:block;font-weight:normal;font-style:italic;font-size:11px;opacity:.9}
 td{padding:10px;border-bottom:1px solid #eee;vertical-align:middle}
-.pn b{font-size:18px}.pn small{display:block;color:var(--grey);font-size:12px}
+.pn b{font-size:18px}.pn .t{display:block;color:var(--dark);font-size:14px;font-weight:bold;margin-top:2px}
 .pill{display:inline-block;min-width:78px;text-align:center;padding:6px 10px;border-radius:14px;font-weight:bold;font-size:14px;color:#fff}
 .pill.Y{background:var(--green)}.pill.P{background:var(--amber);color:#222}.pill.N{background:var(--bad)}.pill.none{background:#ccc;color:#555}
 .dots{margin-top:5px}.dot{display:inline-block;width:11px;height:11px;border-radius:50%;margin-right:3px}.dot.Y{background:var(--green)}.dot.P{background:var(--amber)}.dot.N{background:var(--bad)}
@@ -26,46 +27,53 @@ td{padding:10px;border-bottom:1px solid #eee;vertical-align:middle}
 <header><div><h1>Colloquium results</h1><p>Hasil kolokium · UNIM, 19 Nov 2026 · Readiness profile, not a ranking</p></div><div><button class="alt" id="proj">Projector view</button></div></header>
 <main id="app">
 <div class="tools">
-<b>Paste WhatsApp messages here</b> <small>(one judge's message, or a whole chat; anything else is ignored)</small>
-<textarea id="paste" placeholder="KOLOKIUM|J1|P1|Y,P,N,Y|Testing|note"></textarea>
+<b>Paste WhatsApp messages here</b> <small>(one evaluator's message, or a whole chat; anything else is ignored)</small>
+<textarea id="paste" placeholder="KOLOKIUM|Evaluator|Initiator|Idea title|Y,P,N,Y|Testing|note"></textarea>
 <button id="add">Add results</button><button class="alt" id="csv">Download CSV</button><button class="alt" id="clear">Clear all</button>
-<div id="info"></div></div>
+<div id="info"></div>
+<div style="margin-top:10px"><small><b>Same initiator spelled two ways?</b> Merge:</small>
+<select id="ma"></select> into <select id="mb"></select> <button class="alt" id="mg">Merge</button><button class="alt" id="mu">Undo merges</button></div>
+</div>
 <div id="out"></div>
-<div class="legend">Colours show the judges' average for each criterion: green = Yes, amber = Partly, red = Not yet. Dots show each judge's rating. The stage is the most common label. / Warna menunjukkan rata-rata penilaian juri.</div>
+<div class="legend">Colours show the evaluators' average for each criterion: green = Yes, amber = Partly, red = Not yet. Dots show each evaluator's rating. The stage is the most common label. / Warna menunjukkan rata-rata penilaian.</div>
 <div id="notes"></div>
 </main>
 <script src="config.js"></script><script src="logic.js"></script>
 <script>
 (function(){
-var C=window.KOLOKIUM,L=window.KLogic,KEY='kolokium_results_v1';
-var store={};try{store=JSON.parse(localStorage.getItem(KEY)||'{}')||{};}catch(e){}
+var C=window.KOLOKIUM,L=window.KLogic,KEY='kolokium_results_v2',AK='kolokium_alias_v2';
+var store={},alias={};
+try{store=JSON.parse(localStorage.getItem(KEY)||'{}')||{};}catch(e){}
+try{alias=JSON.parse(localStorage.getItem(AK)||'{}')||{};}catch(e){}
 function $(i){return document.getElementById(i);}
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
-function persist(){try{localStorage.setItem(KEY,JSON.stringify(store));}catch(e){}}
+function persist(){try{localStorage.setItem(KEY,JSON.stringify(store));localStorage.setItem(AK,JSON.stringify(alias));}catch(e){}}
 var LAB={Y:'Yes',P:'Partly',N:'Not yet'};
 var CR=[['Problem and user','Masalah dan pengguna'],['Evidence','Bukti'],['Users accept','Penerimaan pengguna'],['Path','Jalur']];
 var SID={Exploring:'Menjajaki',Testing:'Menguji',Piloting:'Uji coba',Scale:'Siap diperluas'};
 function render(){
- var ids=C.PRESENTERS.map(function(p){return p.id;});
- Object.keys(store).forEach(function(k){var pid=store[k].pid;if(ids.indexOf(pid)<0)ids.push(pid);});
- var html='<table><tr><th>Presenter<small>Pemapar</small></th>'+CR.map(function(c){return '<th>'+c[0]+'<small>'+c[1]+'</small></th>';}).join('')+'<th>Stage<small>Tahap</small></th><th>Judges<small>Juri</small></th></tr>';
+ var gs=L.groups(store,alias,C.INITIATORS);
+ var html='<table><tr><th>Initiator and idea<small>Pemrakarsa dan ide</small></th>'+CR.map(function(c){return '<th>'+c[0]+'<small>'+c[1]+'</small></th>';}).join('')+'<th>Stage<small>Tahap</small></th><th>Evaluators<small>Penilai</small></th></tr>';
  var notes='';
- ids.forEach(function(pid){var p=C.PRESENTERS.filter(function(x){return x.id===pid;})[0];var s=L.summarize(store,pid);
-  html+='<tr><td class="pn"><b>'+esc(pid)+'</b>'+(p&&p.name?'<small>'+esc(p.name)+'</small>':'')+'</td>';
+ gs.forEach(function(s){
+  html+='<tr><td class="pn"><b>'+esc(s.name)+'</b>'+(s.title?'<span class="t">'+esc(s.title)+'</span>':'')+'</td>';
   s.crit.forEach(function(c){html+='<td>'+(c.band?'<span class="pill '+c.band+'">'+LAB[c.band]+'</span><div class="dots">'+c.votes.map(function(v){return '<span class="dot '+v+'"></span>';}).join('')+'</div>':'<span class="pill none">–</span>')+'</td>';});
-  html+='<td class="stage">'+(s.stage?'<b>'+s.stage+'</b><small>'+SID[s.stage]+'</small>':'–')+'</td><td>'+s.n+' / '+C.JUDGES+'</td></tr>';
-  if(s.notes.length){notes+='<p><b>'+esc(pid)+(p&&p.name?' ('+esc(p.name)+')':'')+':</b> '+s.notes.map(function(n){return esc(n.judge)+': '+esc(n.note);}).join(' · ')+'</p>';}
+  html+='<td class="stage">'+(s.stage?'<b>'+s.stage+'</b><small>'+SID[s.stage]+'</small>':'–')+'</td><td>'+s.n+' / '+C.EVALUATORS+'</td></tr>';
+  if(s.notes.length){notes+='<p><b>'+esc(s.name)+(s.title?' ('+esc(s.title)+')':'')+':</b> '+s.notes.map(function(n){return esc(n.ev)+': '+esc(n.note);}).join(' · ')+'</p>';}
  });
- $('out').innerHTML=html+'</table>';
- $('notes').innerHTML=notes?'<div class="notes"><h3>Judges\' notes · Catatan juri</h3>'+notes+'</div>':'';
- var js={};Object.keys(store).forEach(function(k){js[store[k].judge]=1;});
- var got=Object.keys(js).sort();var miss=[];for(var i=1;i<=C.JUDGES;i++){if(!js['J'+i])miss.push('J'+i);}
- $('info').textContent='Judges received: '+(got.join(', ')||'none')+(miss.length&&got.length?'. Waiting for: '+miss.join(', ')+'.':'.');
+ $('out').innerHTML=gs.length?html+'</table>':'<p style="color:#6D6E71">No results yet. Paste evaluators\' WhatsApp messages above. / Belum ada hasil.</p>';
+ $('notes').innerHTML=notes?'<div class="notes"><h3>Evaluators\' notes · Catatan penilai</h3>'+notes+'</div>':'';
+ var evs={};Object.keys(store).forEach(function(k){evs[L.norm(store[k].ev)]=store[k].ev;});
+ var names=Object.keys(evs).map(function(k){return evs[k];}).sort();
+ $('info').textContent='Evaluators received ('+names.length+' / '+C.EVALUATORS+'): '+(names.join(', ')||'none');
+ ['ma','mb'].forEach(function(id){var cur=$(id).value;$(id).innerHTML=gs.map(function(g){return '<option value="'+esc(g.key)+'">'+esc(g.name)+(g.title?' · '+esc(g.title):'')+'</option>';}).join('');if(cur)$(id).value=cur;});
 }
 $('add').onclick=function(){var e=L.parse($('paste').value);if(!e.length){$('info').textContent='No valid results found in that text.';return;}L.merge(store,e);persist();$('paste').value='';render();$('info').textContent='Added '+e.length+' rating(s). '+$('info').textContent;};
-$('clear').onclick=function(){if(confirm('Delete all results on this computer?')){store={};persist();render();}};
+$('mg').onclick=function(){var a=$('ma').value,b=$('mb').value;if(!a||!b||a===b){return;}alias[a]=b;persist();render();};
+$('mu').onclick=function(){alias={};persist();render();};
+$('clear').onclick=function(){if(confirm('Delete all results on this computer?')){store={};alias={};persist();render();}};
 $('proj').onclick=function(){document.body.classList.toggle('proj');$('proj').textContent=document.body.classList.contains('proj')?'Back to controls':'Projector view';};
-$('csv').onclick=function(){var rows=[['judge','presenter','problem_user','evidence','users_accept','path','stage','note']];Object.keys(store).sort().forEach(function(k){var e=store[k];rows.push([e.judge,e.pid].concat(e.r,[e.stage,e.note]));});
+$('csv').onclick=function(){var rows=[['evaluator','initiator','idea_title','problem_user','evidence','users_accept','path','stage','note']];Object.keys(store).sort().forEach(function(k){var e=store[k];rows.push([e.ev,e.ini,e.title].concat(e.r,[e.stage,e.note]));});
  var csv=rows.map(function(r){return r.map(function(x){return '"'+String(x).replace(/"/g,'""')+'"';}).join(',');}).join('\n');
  var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='kolokium_results.csv';a.click();};
 render();
